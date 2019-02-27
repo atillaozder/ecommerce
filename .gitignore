@@ -119,3 +119,5 @@ dmypy.json
 src/.DS_Store
 .DS_Store
 RAD/.DS_Store
+
+*.bak_000f
