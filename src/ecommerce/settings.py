@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -37,6 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'product.apps.ProductConfig',
+    'account.apps.AccountConfig',
+    'category.apps.CategoryConfig',
+    'order.apps.OrderConfig',
+    'cart.apps.CartConfig',
+    'address.apps.AddressConfig'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +61,7 @@ ROOT_URLCONF = 'ecommerce.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR), "apps/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,21 +107,43 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# AUTH_USER_MODEL = 'account.User'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login'
+LOGOUT_REDIRECT_URL = '/login'
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'en-EN'
+TIME_ZONE = 'Europe/Istanbul'
 USE_I18N = True
-
 USE_L10N = True
-
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+)
+
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'statics/static_dev')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'statics/media_dev')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'statics/static'),
+    os.path.join(BASE_DIR, 'statics/media'),
+]
+
+# AUTHENTICATION_BACKENDS = [
+#     'apps.account.backends.DualAuthentication',
+# ]
+#
+# AUTHENTICATION_METHOD = 'both'
+# AUTHENTICATION_CASE_SENSITIVE = 'both'
