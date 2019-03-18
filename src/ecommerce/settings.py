@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# AUTH_USER_MODEL = 'account.User'
+AUTH_USER_MODEL = 'account.User'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
 LOGOUT_REDIRECT_URL = '/login'
@@ -141,9 +141,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'statics/media'),
 ]
 
-# AUTHENTICATION_BACKENDS = [
-#     'apps.account.backends.DualAuthentication',
-# ]
-#
-# AUTHENTICATION_METHOD = 'both'
-# AUTHENTICATION_CASE_SENSITIVE = 'both'
+AUTHENTICATION_BACKENDS = (
+    # ('django.contrib.auth.backends.ModelBackend'),
+    ('apps.account.backends.DualAuthentication'),
+)
+
+AUTHENTICATION_METHOD = 'both'
+AUTHENTICATION_CASE_SENSITIVE = 'both'
