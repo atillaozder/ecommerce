@@ -126,3 +126,5 @@ RAD/.DS_Store
 
 *.bak_000f
 *.idea
+
+\.idea/
