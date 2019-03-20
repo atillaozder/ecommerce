@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %}{% endblock title %}
+{% block header %}
+<section class="section-intro bg-danger text-white text-center">
+    <div class="container d-flex flex-column" style="min-height:20vh;">
+        <div class="row mt-auto">
+            <div class="col-lg-9 col-md-8 col-sm-12 mx-auto text-center">
+                <form class="form-noborder" method="GET">
+                    <div class="form-row mb-5 my-4">
+                        <div class="col-lg-6 col-sm-12 form-group">
+                            <input class="form-control form-control-lg" name="q" placeholder="{% trans 'Search...' %}" type="text">
+                        </div>
+                        <div class="col-lg-3 col-sm-12 form-group">
+                            <select class="custom-select form-control-lg" name="category">
+                                <option value="all" selected>{% trans "Choose a category" %}</option>
+                            	   <!-- {% for category in categories %}
+                                    <option value="{{ category.slug }}"> {{ category.name }} </option>
+                                {% endfor %} -->
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-sm-12 form-group">
+                            <button class="btn btn-warning btn-block btn-lg" type="submit">{% trans "Search" %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock header %}
+{% block content %}
+
+{% endblock content %}

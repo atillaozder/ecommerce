@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.auth.models import Group
-from account.forms import AdminUpdateForm, AdminCreationForm
-from account.models import Distributor
+from .forms import AdminUpdateForm, AdminCreationForm
+from .models import Distributor
 
 User = get_user_model()
 admin.site.unregister(Group)

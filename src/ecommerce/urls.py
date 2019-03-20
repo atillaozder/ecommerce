@@ -17,15 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import HomeView
 
 urlpatterns = [
-    # path('', , name='home'),
+    path('', HomeView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     # path('cart/', include('cart.urls')),
     # path('orders/', include('order.urls')),
     # path('products/', include('product.urls')),
     # path('address/', include('address.urls')),
-    # path('', include('account.urls')),
+    path('', include('account.urls')),
 ]
 
 if settings.DEBUG:

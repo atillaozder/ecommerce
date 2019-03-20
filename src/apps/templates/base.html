@@ -1,0 +1,57 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock title %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="{% static 'ecommerce/img/favicon.png' %}">
+  {% include "include/css.html" %}
+  <style media="screen">{% block style %}{% endblock style %}</style>
+</head>
+<body>
+  <header class="section-header">
+    {% include "include/nav.html" %}
+    {% block header %}{% endblock header %}
+  </header>
+
+  {% block content %}{% endblock content %}
+
+  {% if messages %}
+  {% for message in messages %}
+    <div id="snackbar" style="z-index:999;">
+      {{ message }}
+      <button type="button" id="snackbarClose" class="close ml-2 my-auto">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% endif %}
+
+  {% include "include/js.html" %}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      showSnackbar();
+    });
+
+    function showSnackbar() {
+      var snackbar = document.getElementById("snackbar");
+      if (snackbar) {
+        snackbar.className = "show";
+        setTimeout(function () {
+          snackbar.className = snackbar.className.replace("show", "");
+        }, 6500);
+      }
+    }
+
+    $('#snackbarClose').click(function() {
+      $('#snackbar').hide();
+    })
+  </script>
+  {% block script %}{% endblock script %}
+</body>
+</html>

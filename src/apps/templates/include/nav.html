@@ -1,0 +1,109 @@
+{% load static %}
+{% load i18n %}
+
+<nav class="navbar navbar-parent navbar-expand-sm fixed-top">
+  <div class="container">
+    <div class="brand-wrap d-none d-sm-block">
+      <a class="logo" href="#">
+        <img src="{% static 'uikit/images/brand.png' %}" alt="Logo" width="50" height="50">
+      </a>
+    </div>
+
+    {% if request.user.is_authenticated %}
+      <li class="nav-link dropdown ml-auto">
+        <button class="btn btn-outline-secondary" id="profileDropdown"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            style="padding: 8px 10px 8px 10px;">
+          <span class="float-left mr-2 mt-1">
+            <i class="fas fa-user fa-lg"></i>
+          </span>
+          <h6 class="float-left mt-1 d-none d-sm-block">{{ request.user.username }}</h6>
+          <span class="float-right ml-2 mt-1">
+            <i class="fas fa-angle-down fa-lg"></i>
+          </span>
+        </button>
+        <div class="dropdown-menu mt-1" aria-labelledby="profileDropdown">
+          <a class="dropdown-item" href="#">{% trans "Profile" %}</a>
+          {% if request.user.user_type == 'customer' and not request.user.is_staff %}
+          <a class="dropdown-item" href="#">{% trans "Previous Orders" %}</a>
+          {% endif %}
+          <a class="dropdown-item" href="#">{% trans "Settings" %}</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'users:logout' %}">{% trans "Sign out" %}</a>
+        </div>
+      </li>
+      {% if request.user.user_type == 'customer' and not request.user.is_staff %}
+        <a href="#" role="button" aria-pressed="true"
+          class="btn btn-secondary d-none d-sm-block bg-secondary" id="userBasket"
+          style="padding: 8px 0 8px 10px;">
+          <span class="float-left mr-3 mt-1">
+            <i class="fas fa-shopping-cart fa-lg"></i>
+          </span>
+          <h6 class="float-left mt-1">{% trans "My Basket" %}</h6>
+          <span class="badge badge-pill badge-danger"
+              style="right: 90px; top: -8px;">
+            0
+          </span>
+        </a>
+
+        <a href="#" role="button" aria-pressed="true"
+          class="btn btn-secondary d-block d-sm-none bg-secondary" id="userBasket"
+          style="padding: 8px 0 8px 10px;">
+          <span class="float-left mr-3 mt-1">
+            <i class="fas fa-shopping-cart fa-lg"></i>
+          </span>
+          <span class="badge badge-pill badge-danger"
+              style="right: 25px; top: -8px;">
+              0
+          </span>
+        </a>
+        {% else %}
+          <a href="#" role="button" aria-pressed="true"
+            class="btn btn-outline-info"
+            style="padding: 8px 10px 8px 10px;">
+            <span class="mt-1 mr-1 ml-1 d-sm-none d-block">
+              <i class="fas fa-registered fa-lg"></i>
+            </span>
+            <h6 class="mt-1 d-none d-sm-block">{% trans "Product Registration" %}</h6>
+          </a>
+      {% endif %}
+    {% else %}
+      <div class="col-lg-6-24 col-sm-7 col-8 order-2 order-lg-3">
+    		<div class="d-flex justify-content-end">
+    			<div class="widget-header">
+    				<small class="title text-muted">{% trans "Welcome guest!" %}</small>
+    				<div>
+              <a href="{% url 'users:login' %}">{% trans "Sign in" %}</a>
+              <span class="dark-transp"> | </span>
+    				  <a href="#"> {% trans "Register" %}</a>
+            </div>
+    			</div>
+    		</div>
+    	</div>
+    {% endif %}
+  </div>
+</nav>
+<section class="navbar navbar-expand-sm navbar-child bg-danger">
+  <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="text-white"><i class="fas fa-angle-down"></i></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav mx-auto my-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">{% trans "Home" %} <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">{% trans "-" %}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">{% trans "-" %}</a>
+      </li>
+      {% if request.user.is_authenticated and request.user.user_type == 'customer' and not request.user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link" href="#">{% trans "Orders" %}</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</section>

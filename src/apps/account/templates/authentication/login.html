@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Sign in" %}{% endblock title %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5">
+      <div class="card">
+        <article class="card-body">
+          <h5 class="card-title text-center">{% trans "Sign In" %}</h5>
+          <hr>
+          <form method="post">
+            {% csrf_token %}
+            <p class="text-danger">
+              {% for non_field_error in form.non_field_errors  %}
+                {{ non_field_error|striptags|escape }}
+              {% endfor %}
+              {% for hidden_field in form.hidden_fields %}
+                {% for error in hidden_field.errors %}
+                    {{ error|striptags|escape }}
+                {% endfor %}
+              {% endfor %}
+              {% for field in form.visible_fields %}
+                {% for error in field.errors %}
+                    {{ error|striptags|escape }}
+                {% endfor %}
+              {% endfor %}
+            </p>
+            <div class="form-group">
+              <label for="id_username">{% trans "Email or Username" %}:</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                </div>
+                <input id="id_username" name="username"
+                  class="form-control" placeholder="{% trans "Email or Username" %}"
+                  type="text" autofocus>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="id_password">{% trans "Password" %}:</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                </div>
+                <input id="id_password" class="form-control" name="password" placeholder="{% trans "Password" %}" type="password">
+              </div>
+            </div>
+            <div class="form-group text-center">
+              <button type="submit" class="btn btn-danger btn-block"> {% trans "Sign In" %}  </button>
+              <p class="text-primary mt-3"><a href="{% url 'users:password_reset' %}">{% trans "Forgot password?" %}</a></p>
+            </div>
+          </form>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
