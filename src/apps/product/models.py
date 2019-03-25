@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
-from utils.utils import get_upload_path
+from src.utils.utils import get_upload_path
 from decimal import Decimal
 from django.conf import settings
 
@@ -112,8 +112,8 @@ class ProductQuerySet(models.query.QuerySet):
     def not_approved(self):
         return self.filter(is_approved=False)
 
-        def accepted(self):
-            return self.active().not_deleted().approved()
+    def accepted(self):
+        return self.active().not_deleted().approved()
 
     def pending(self):
         return self.active().not_deleted().not_approved()
@@ -175,10 +175,10 @@ class ProductImage(models.Model):
 class ProductLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product',
-                                    on_delete=models.SET_NULL,
-                                    null=True,
-                                    blank=True,
-                                    related_name='product_like')
+                                on_delete=models.SET_NULL,
+                                null=True,
+                                blank=True,
+                                related_name='product_like')
 
     rate = models.DecimalField(default=0, max_digits=3, decimal_places=1)
     timestamp = models.DateTimeField(auto_now_add=True)
