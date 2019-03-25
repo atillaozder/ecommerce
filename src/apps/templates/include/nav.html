@@ -4,7 +4,7 @@
 <nav class="navbar navbar-parent navbar-expand-sm fixed-top">
   <div class="container">
     <div class="brand-wrap d-none d-sm-block">
-      <a class="logo" href="#">
+      <a class="logo" href="{% url 'home' %}">
         <img src="{% static 'uikit/images/brand.png' %}" alt="Logo" width="50" height="50">
       </a>
     </div>
@@ -24,7 +24,7 @@
         </button>
         <div class="dropdown-menu mt-1" aria-labelledby="profileDropdown">
           <a class="dropdown-item" href="#">{% trans "Profile" %}</a>
-          {% if request.user.user_type == 'customer' and not request.user.is_staff %}
+          {% if request.user.type == 'customer' and not request.user.is_staff %}
           <a class="dropdown-item" href="#">{% trans "Previous Orders" %}</a>
           {% endif %}
           <a class="dropdown-item" href="#">{% trans "Settings" %}</a>
@@ -32,7 +32,8 @@
           <a class="dropdown-item" href="{% url 'users:logout' %}">{% trans "Sign out" %}</a>
         </div>
       </li>
-      {% if request.user.user_type == 'customer' and not request.user.is_staff %}
+
+      {% if request.user.type == 'customer' and not request.user.is_staff %}
         <a href="#" role="button" aria-pressed="true"
           class="btn btn-secondary d-none d-sm-block bg-secondary" id="userBasket"
           style="padding: 8px 0 8px 10px;">
@@ -57,29 +58,22 @@
               0
           </span>
         </a>
-        {% else %}
-          <a href="#" role="button" aria-pressed="true"
-            class="btn btn-outline-info"
-            style="padding: 8px 10px 8px 10px;">
-            <span class="mt-1 mr-1 ml-1 d-sm-none d-block">
-              <i class="fas fa-registered fa-lg"></i>
-            </span>
-            <h6 class="mt-1 d-none d-sm-block">{% trans "Product Registration" %}</h6>
-          </a>
       {% endif %}
+
+
     {% else %}
       <div class="col-lg-6-24 col-sm-7 col-8 order-2 order-lg-3">
-    		<div class="d-flex justify-content-end">
-    			<div class="widget-header">
-    				<small class="title text-muted">{% trans "Welcome guest!" %}</small>
-    				<div>
-              <a href="{% url 'users:login' %}">{% trans "Sign in" %}</a>
-              <span class="dark-transp"> | </span>
-    				  <a href="#"> {% trans "Register" %}</a>
+        <div class="d-flex justify-content-end">
+            <div class="widget-header">
+                <small class="title text-muted">{% trans "Welcome guest!" %}</small>
+                <div>
+                    <a href="{% url 'users:login' %}">{% trans "Login" %}</a>
+                    <span class="dark-transp"> | </span>
+                    <a href="{% url 'users:register' %}"> {% trans "Register" %}</a>
+                </div>
             </div>
-    			</div>
-    		</div>
-    	</div>
+        </div>
+      </div>
     {% endif %}
   </div>
 </nav>
@@ -91,7 +85,7 @@
   <div class="collapse navbar-collapse" id="navbarNavDropdown">
     <ul class="navbar-nav mx-auto my-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">{% trans "Home" %} <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{% url 'home' %}">{% trans "Home" %} <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">{% trans "-" %}</a>
@@ -99,11 +93,6 @@
       <li class="nav-item">
         <a class="nav-link" href="#">{% trans "-" %}</a>
       </li>
-      {% if request.user.is_authenticated and request.user.user_type == 'customer' and not request.user.is_staff %}
-        <li class="nav-item">
-          <a class="nav-link" href="#">{% trans "Orders" %}</a>
-        </li>
-      {% endif %}
     </ul>
   </div>
 </section>

@@ -7,5 +7,5 @@ def password_validators_help_text_html(password_validators=None):
     in an .
     """
     help_texts = password_validation.password_validators_help_texts(password_validators)
-    help_items = format_html_join('', '<p class="text-danger">{}</p>', ((help_text,) for help_text in help_texts))
+    help_items = format_html_join('', '<p class="text-muted">{}</p>', ((help_text,) for help_text in help_texts))
     return format_html('<div>{}</div>', help_items) if help_items else ''

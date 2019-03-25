@@ -65,7 +65,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     CUSTOMER = _('customer')
 
     USER_TYPE = (
-        (MANAGER, _('Manager')),
         (DISTRIBUTOR, _('Distributor')),
         (CUSTOMER, _('Customer'))
     )
@@ -96,7 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                        help_text=_('Designates that this user '
                                                    'has all permissions without explicitly assigning them.'))
 
-    type = models.CharField(_('Type of User'), max_length=100, choices=USER_TYPE, default=CUSTOMER)
+    type = models.CharField(_('Register as'), max_length=100, choices=USER_TYPE, default=CUSTOMER)
     image = models.ImageField(upload_to=get_upload_path,
                               width_field='width_field',
                               height_field='height_field',
@@ -124,20 +123,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     def get_absolute_url(self):
-        pass
+        return reverse('users:detail', kwargs={'username': self.username})
 
     def is_distributor(self):
         if self.type == self.DISTRIBUTOR:
             return True
         return False
 
-    def is_waiting_approvement(self):
+    def is_approved(self):
         return self.distributor.is_approved
-
-    def is_manager(self):
-        if self.type == self.MANAGER:
-            return True
-        return False
 
     def get_full_name(self):
         fullname = '{0} {1}'.format(self.first_name, self.last_name)
