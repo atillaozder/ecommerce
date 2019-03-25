@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponseRedirect
+from django.shortcuts import HttpResponseRedirect, redirect, render
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.auth import (
     login as auth_login,
     get_user_model,
-    update_session_auth_hash
+    update_session_auth_hash,
+    authenticate
 )
 
 from django.contrib.auth.views import (
@@ -17,7 +18,8 @@ from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN
 )
 
-from apps.account.forms import UserPasswordChangeForm, UserSetPasswordForm
+from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm
+from django.views.generic import View, CreateView
 
 User = get_user_model()
 
@@ -28,12 +30,40 @@ class UserLoginView(LoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        if user.is_distributor() and not user.is_waiting_approvement():
+        if user.is_distributor() and not user.is_approved():
             info_message = _('Your membership must be approved by admin.')
             messages.add_message(self.request, messages.INFO, info_message)
         else:
             auth_login(self.request, form.get_user())
         return HttpResponseRedirect(self.get_success_url())
+
+
+class UserRegisterView(CreateView):
+    template_name = 'authentication/register.html'
+    form_class = UserRegisterForm
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        context = {'form': self.form_class}
+        return render(request, 'authentication/register.html', context)
+
+    def form_valid(self, form):
+        valid = super(UserRegisterView, self).form_valid(form)
+        if valid:
+            user = form.instance
+            if user.is_distributor():
+                info_message = _('Your request is sent. Please wait for approvement of admin.')
+                messages.add_message(self.request, messages.INFO, info_message)
+            else:
+                username = self.request.POST.get("username").strip()
+                password = self.request.POST.get("password")
+                user = authenticate(username=username, password=password)
+                auth_login(self.request, user)
+        return valid
+
+    def get_success_url(self):
+        return reverse_lazy('home')
 
 
 class UserPasswordChangeView(PasswordChangeView):

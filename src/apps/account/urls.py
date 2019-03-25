@@ -7,6 +7,7 @@ app_name = 'users'
 registration_patterns = [
     path('login', UserLoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
+    path('register', UserRegisterView.as_view(), name='register'),
     path('password/change/', UserPasswordChangeView.as_view(), name='password_change'),
     path('password/reset/', UserPasswordResetView.as_view(), name='password_reset'),
     path('password/reset/<uidb64>/<token>', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm')
