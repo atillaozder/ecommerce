@@ -73,3 +73,18 @@ class ProductCreateView (LoginRequiredMixin,CreateView):
                 form.instance.is_approved = True
                 form.instanceSave()
             return valid
+
+
+class ProductApprovePendingListView(LoginRequiredMixin, ListView):
+    queryset = Product.objects.all().pending()
+    paginate_by = 10
+    context_object_name = 'products'
+    #template_name = 'product_pending_approve.html'
+
+    def get_context_data(self, *args, **kwargs):
+        if self.request.user.is_staff:
+            return super(ProductApprovePendingListView, self).get_context_data(**kwargs)
+        else:
+            raise Http404
+
+
