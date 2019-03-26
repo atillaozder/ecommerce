@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from .models import Product, ProductLike, ProductImage
 from django.contrib import messages
 from django.shortcuts import render
-from src.apps.product.forms import ProductForm
+from .forms import ProductForm
 from django.views.generic import (
     View,
     DetailView,

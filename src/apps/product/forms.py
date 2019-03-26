@@ -2,7 +2,6 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from product.models import Product, ProductImage
-from brand.models import Brand
 
 class ProductForm(forms.ModelForm):
     images = forms.ImageField(
@@ -14,7 +13,7 @@ class ProductForm(forms.ModelForm):
         'name',
         'category',
         'essential_product',
-        'brand',
+        #'brand',
         'description',
         'price',
         'discount',
@@ -35,10 +34,10 @@ class ProductForm(forms.ModelForm):
         self.fields['essential_product'].widget.attrs.update({
             'class' : 'form-control',
         })
-        self.fields['brand'].widget.attrs.update({
-            'class' : 'form-control',
-            'placeholder': _('Brand'),
-        })
+        #self.fields['brand'].widget.attrs.update({
+         #   'class' : 'form-control',
+          #  'placeholder': _('Brand'),
+       # })
         self.fields['description'].widget.attrs.update({
             'class' : 'form-control',
             'placeholder': _('Description'),
@@ -71,6 +70,6 @@ class ProductForm(forms.ModelForm):
             'discount',
             'stock',
             'weight',
-            'brand',
+            #'brand',
             'images'
         ]

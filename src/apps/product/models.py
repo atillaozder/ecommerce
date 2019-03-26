@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
-from src.utils.utils import get_upload_path
+from utils import get_upload_path
 from decimal import Decimal
 from django.conf import settings
 
@@ -147,21 +147,21 @@ class ProductManager(models.Manager):
 
 class ProductImage(models.Model):
     product= models.ForeignKey('Product',
-                                        on_delete=models.CASCADE,
-                                        related_name='product_image')
+                               on_delete=models.CASCADE,
+                               related_name='product_image')
 
     image= models.ImageField(upload_to=get_upload_path,
-                                        height_field='height_field',
-                                        width_field='width_field',
-                                        null=True,
-                                        blank=True,
-                                        verbose_name='Product Image',
-                                        max_length=255)
+                             height_field='height_field',
+                             width_field='width_field',
+                             null=True,
+                             blank=True,
+                             verbose_name='Product Image',
+                             max_length=255)
 
     width_field= models.PositiveIntegerField(default=0,
-                                                  verbose_name='Image Width',
-                                                  null=True,
-                                                  blank=True)
+                                             verbose_name='Image Width',
+                                             null=True,
+                                             blank=True)
 
     height_field    = models.PositiveIntegerField(default=0,
                                                   verbose_name='Image Height',
