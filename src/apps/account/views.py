@@ -1,10 +1,11 @@
-from django.shortcuts import HttpResponseRedirect, redirect, render
+from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import (
     login as auth_login,
+    logout as auth_logout,
     get_user_model,
     update_session_auth_hash,
     authenticate
@@ -20,6 +21,7 @@ from django.contrib.auth.views import (
 
 from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm
 from django.views.generic import View, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 User = get_user_model()
 
@@ -159,3 +161,50 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
 
         messages.add_message(self.request, messages.INFO, info_message)
         return valid
+
+
+class UserDetailView(View):
+
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username', None)
+        context = {}
+        if username:
+            user = get_object_or_404(User, username=username)
+            context['object'] = user
+        return render(request, "user_profile.html", context)
+
+
+class UserDeleteView(LoginRequiredMixin, View):
+
+    def post(self):
+        user = self.request.user
+        user.is_active = False
+        auth_logout(user)
+        user.save()
+        return redirect('users:login')
+
+
+class UserUpdateView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        return render(request, "user_update.html", {})
+
+    def post(self, request):
+        user = self.request.user
+        first_name = request.POST.get("first_name", "")
+        last_name = request.POST.get("last_name", "")
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        return redirect(user.get_absolute_url())
+
+
+class UserImageUpdateView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        user = self.request.user
+        image = request.FILES.get("profile_image", None)
+        if image:
+            user.image = image
+            user.save()
+        return redirect(user.get_absolute_url())

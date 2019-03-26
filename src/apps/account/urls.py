@@ -1,5 +1,5 @@
 from django.urls import path, include
-from django.contrib.auth.views import (LogoutView)
+from django.contrib.auth.views import LogoutView
 from .views import *
 
 app_name = 'users'
@@ -15,4 +15,8 @@ registration_patterns = [
 
 urlpatterns = [
     path('', include(registration_patterns)),
+    path('account/delete', UserDeleteView.as_view(), name='delete'),
+    path('account/image/change', UserImageUpdateView.as_view(), name='update_image'),
+    path('account/edit', UserUpdateView.as_view(), name='update'),
+    path('<username>', UserDetailView.as_view(), name='profile'),
 ]
