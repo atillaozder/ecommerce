@@ -288,7 +288,7 @@ class Address(models.Model):
         verbose_name_plural = _('Addresses')
 
     def __str__ (self):
-        return self.name
+        return self.address_line
 
 
     def get_address(self):
