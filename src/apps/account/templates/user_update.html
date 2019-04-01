@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ request.user.username }} | {% trans "Account" %}{% endblock title %}
+{% block content %}
+<div class="container">
+  <nav class="mb-4 mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ request.user.get_absolute_url }}">{% trans "Profile" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Update Profile Informations" %}</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-2">
+      <div class="card">
+        <article class="card-body">
+          <form method="post">{% csrf_token %}
+              <div class="form-group">
+                  <input type="text" class="form-control" name="first_name"
+                         value="{{ request.user.first_name }}"
+                         placeholder="First Name">
+              </div>
+              <div class="form-group">
+                  <input type="text" class="form-control" name="last_name"
+                         value="{{ request.user.last_name }}"
+                         placeholder="Last Name">
+              </div>
+              <div class="form-group text-center">
+                  <button type="submit" class="btn btn-danger btn-block"> {% trans "Update" %}  </button>
+              </div>
+          </form>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
