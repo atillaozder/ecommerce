@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}{{ product.name }}{% endblock title %}
+{% block content %}
+<section class="section-content bg padding-y-sm">
+	<div class="container">
+		<nav class="mb-4 mt-2">
+			<ol class="breadcrumb">
+			    <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+			    <li class="breadcrumb-item"><a href="{{ product.category.first.get_absolute_url }}">{{ product.category.first.name }}</a></li>
+			    <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:75 }}</li>
+			</ol>
+		</nav>
+		<div class="row">
+			<div class="{% if product.essential_product %} col-xl-8 col-lg-8 col-12 mb-3 {% else %} col-12 mb-3 {% endif %}">
+				<main class="card">
+					<div class="row no-gutters">
+						<aside class="col-md-6 border-right my-auto">
+							<article class="gallery-wrap">
+								<div class="img-big-wrap">
+									<div>
+										<a href="{{ product.get_first_image_url }}" data-fancybox="images">
+											<img src="{{ product.get_first_image_url }}"
+													class="img-lg img-thumbnail" alt="{{ product.name }}"
+													style="border: 0 none;">
+										</a>
+									</div>
+								</div> <!-- slider-product.// -->
+								<div class="img-small-wrap mt-5">
+									{% for product_image in product.product_image.all  %}
+										{% if forloop.counter > 1 %}
+										<div class="item-gallery">
+											<figure class="media">
+												<a href="{{ product_image.image.url }}" data-fancybox="images">
+													<img src="{{ product_image.image.url }}" class="img-sm img-thumbnail"
+															alt="{{ product.name }}" style="border: 0 none;">
+												</a>
+											</figure>
+										</div>
+										{% endif %}
+									{% endfor %}
+								</div> <!-- slider-nav.// -->
+							</article> <!-- gallery-wrap .end// -->
+						</aside>
+						<aside class="col-md-6">
+							<article class="card-body">
+								<!-- short-info-wrap -->
+								<h3 class="title mb-3">{{ product.name }}</h3>
+									<div class="mb-3">
+										<var class="price h3 text-warning">
+											{% if product.discount > 0 %}
+												<del class="text-muted"><span class="num">${{ product.price }}</span></del>
+												<br>
+												<span class="num">${{ product.discount_price }}</span>
+											{% else %}
+												<span class="currency"></span><span class="num">${{ product.discount_price }}</span>
+											{% endif %}
+										</var>
+										<br>
+										{% if product.discount > 0 %}
+											<var class="price">
+												<span class="num text-danger">
+													{% trans "Your Save" %} ${{ product.get_saved_price }}
+												</span>
+												<br>
+											</var>
+										{% endif %}
+										<span class="num text-success">{% trans "Free shipping" %}</span>
+									</div> <!-- price-detail-wrap .// -->
+									<dl>
+					  				<dt>{% trans "Description" %}</dt>
+									  <dd><p class="mt-2" style="line-height: 1.8">{{ product.description }}</p></dd>
+									</dl>
+									<div class="rating-wrap">
+										<div class="label-rating">
+											<div class="row">
+												<div class="col-4 my-auto text-warning">
+													<i class="fas fa-star fa-2x"></i>
+												</div>
+												<div class="col-8 mt-2 pl-0">
+													<span style="font-size: 1.3em;"><strong>{{ product.get_avg_like }}</strong></span><span class="text-muted" style="font-size: .9em;">/10</span>
+													<p style="font-size: .9em;">{{ product.product_like.all.count}} {% trans "people rate this." %}</p>
+												</div>
+											</div>
+										</div>
+										<div class="label-rating">
+											<div class="row">
+												<div class="col my-2">
+													<span style="font-size: 1.1em;">{{ product.order_amount }} {% trans "orders" %}</span>
+												</div>
+											</div>
+										</div>
+										{% if request.user.user_type == 'customer' and not request.user.is_staff %}
+											<div class="label-rating">
+												<form action="{% url 'products:rate' product.slug %}" method="POST">
+													<div class="row">
+														<div class="col-6 my-auto text-warning">
+																{% csrf_token %}
+																<input type="number" name="rating" id="ratingInput"
+																		min="0" step="0.1" max="10"
+																		class="form-control my-2" value="0" style="width: 65px;">
+														</div>
+														<div class="col-6 pl-0 my-auto">
+															<button class="btn btn-outline-warning"
+																			type="submit" name="id" value="{{ product.pk }}">
+																{% trans "Rate this" %}
+															</button>
+														</div>
+													</div>
+												</form>
+											</div>
+										{% endif %}
+									</div> <!-- rating-wrap.// -->
+									{% if request.user.user_type == 'customer' and not request.user.is_staff %}
+									<hr>
+									<form method="POST" action="{% url 'products:add_to_cart' product.slug %}">
+										<div class="row">
+												{% csrf_token %}
+												<input type="hidden" name="id" value="{{ product.pk }}">
+												<div class="col-sm-6">
+													<dl class="dlist-inline">
+														{% if product.stock == 0 %}
+																<dt>
+																	<span class="badge bg-danger text-white"
+																		style="height: 25px; line-height: 20px;">
+																		{% trans "NO STOCK" %}
+																	</span>
+																</dt>
+														{% else %}
+																<dt>{% trans "Quantity" %}: </dt>
+																<dd>
+																	<input type="number" name="quantity" id="{{ product.pk }}"
+																			min="1" step="1" max="{{ product.stock }}"
+																			class="form-control my-2" value="1">
+																</dd>
+														{% endif %}
+													</dl>  <!-- item-property .// -->
+												</div> <!-- col.// -->
+												{% if product.stock > 0 %}
+													<div class="col-sm-6">
+														<button type="submit" class="btn btn-outline-danger my-2 float-right">
+															{% trans "Add to cart" %}
+														</button>
+													</div>
+												{% endif %}
+										</div>
+									</form>
+								{% endif %}
+								</article> <!-- card-body.// -->
+						</aside> <!-- col.// -->
+					</div> <!-- row.// -->
+				</main> <!-- card.// -->
+			</div> <!-- col // -->
+
+			{% if product.essential_product %}
+			<aside class="col-xl-4 col-lg-4 col-12">
+				<div class="card">
+					<div class="card-header">
+						<h6 class="text-center">{% trans "Essential product" %}</h6>
+					</div>
+					<div class="card-body row">
+						<div class="col-md-12">
+							<figure class="item mb-3">
+									<a href="{{ product.essential_product.get_first_image_url }}" class="img-wrap mb-3" data-fancybox="">
+										<img src=" {{ product.essential_product.get_first_image_url }}" class="img-md img-thumbnail"
+													alt="{{ product.essential_product.name }}" style="border: 0 none;">
+									</a>
+									<figcaption class="info-wrap">
+										<a href="{{ product.essential_product.get_absolute_url }}"
+											class="title">{{ product.essential_product.name }}</a>
+										<div class="price-wrap mb-3">
+											<span class="price-new">${{ product.essential_product.discount_price }}</span> {% if product.essential_product.discount > 0 %}
+											    <del class="price-old">$ {{ product.essential_product.price }}</del>
+											{% endif %}
+										</div> <!-- price-wrap.// -->
+									</figcaption>
+							</figure> <!-- card-product // -->
+						</div> <!-- col.// -->
+					</div> <!-- card-body.// -->
+				</div> <!-- card.// -->
+			</aside> <!-- col // -->
+			{% endif %}
+		</div> <!-- row.// -->
+		<div class="row">
+			<div class="col">
+				<article class="card mt-3">
+					<div class="card-body">
+						<h5 class="text-center">{% trans "Top sellers products in" %} {{ product.category.first.name }}</h5>
+						<table class="table shopping-cart-wrap">
+							<thead class="text-muted">
+								<tr>
+									<th scope="col" width="10%"></th>
+									<th scope="col" width="60%"></th>
+									<th scope="col" width="15%"></th>
+									<th scope="col" width="15%"></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for product in best_products %}
+								<tr>
+									<td>
+										<figure class="media">
+											<div class="img-wrap">
+												<img src="{{ product.get_first_image_url }}" alt="{{ product.name }}"
+														class="img-thumbnail img-sm">
+											</div>
+										</figure>
+									</td>
+									<td>
+										<a href="{{ product.get_absolute_url }}">
+											<h6 class="title">
+												{{ product.name }}
+											</h6>
+										</a>
+									</td>
+									<td>
+										<div class="price-wrap mt-2">
+											<var class="price text-dark">
+											{% if p.discount > 0 %}
+											    <del class="price-old">${{product.price}}</del>
+											{% endif %}
+											<span class="price-new">${{product.discount_price}}</span>
+											</var>
+										</div> <!-- price-wrap .// -->
+									</td>
+									<td class="text-right">
+										{% if request.user.user_type == 'customer' and not request.user.is_staff %}
+										<form action="{% url 'products:add_to_cart' product.slug %}" method="post">
+											{% csrf_token %}
+											<input type="hidden" name="id" value="{{ product.pk }}">
+											<input type="hidden" name="quantity" value="1">
+											<button type="submit" name="button"
+												class="btn btn-outline-danger mr-3 mt-2">
+												{% trans "Add to cart" %}
+											</button>
+										</form>
+										{% endif %}
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div> <!-- card-body.// -->
+				</article> <!-- card.// -->
+			</div>
+		</div>
+	</div><!-- container // -->
+</section>
+
+{% endblock content %}
+
+{% block script %}
+<script type="text/javascript">
+		$(':input').on('keyup change click', function() {
+			var value = parseInt($(this).val());
+			if (value) {
+				if (value < 0 || $(this).val().startsWith(0)) {
+					$(this).val(1);
+				}
+
+				var max = parseInt($(this).attr("max"));
+				if (value > max) {
+					$(this).val(max);
+				}
+			}
+		});
+</script>
+{% endblock script %}
