@@ -67,7 +67,7 @@ class ProductManager(models.Manager):
 
 
 class Product(models.Model):
-
+    distributor = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     category = models.ManyToManyField('category.Category', blank=True)
     name = models.CharField(_('Title'), max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
@@ -75,7 +75,7 @@ class Product(models.Model):
     price = models.DecimalField(_('Price'), default=0.00, max_digits=100, decimal_places=2)
     discount_price = models.DecimalField(_('Discount Price'), default=0.00, max_digits=100, decimal_places=2)
     order_amount = models.PositiveIntegerField(_('Total order'), default=0)
-    likes = models.ManyToManyField(User, through='ProductLike')
+    likes = models.ManyToManyField(User, through='ProductLike', related_name='likes')
     stock = models.PositiveIntegerField(_('Stock'), default=0)
     discount = models.PositiveIntegerField(_('Discount'), default=0)
 

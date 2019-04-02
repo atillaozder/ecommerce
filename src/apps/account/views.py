@@ -22,6 +22,8 @@ from django.contrib.auth.views import (
 from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm
 from django.views.generic import View, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Distributor
+from product.models import Product
 
 User = get_user_model()
 
@@ -170,6 +172,9 @@ class UserDetailView(View):
         context = {}
         if username:
             user = get_object_or_404(User, username=username)
+            if isinstance(user, Distributor):
+                qs = Product.objects.filter(user=user.distributor)
+                context['products'] = qs
             context['object'] = user
         return render(request, "user_profile.html", context)
 
