@@ -1,7 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-
 from .models import Product
 from django.http import HttpResponseRedirect, Http404
 from django.core.exceptions import ValidationError
@@ -16,6 +15,7 @@ from django.views.generic import (
     ListView,
     CreateView,
 )
+from django.utils.translation import gettext_lazy as _
 
 # Create your views here.
 
@@ -27,7 +27,7 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        instance = context ['product']
+        instance = context['product']
         category = instance.category.all().first()
         products = Product.objects.exclude(pk=instance.pk).by_order_amount(250, category=category)
         context['best_products'] = products
@@ -56,7 +56,7 @@ def _handle_product_form(request, product, images=None):
         instance.save()
 
 
-class ProductCreateView (LoginRequiredMixin,CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'product_form.html'
@@ -65,11 +65,11 @@ class ProductCreateView (LoginRequiredMixin,CreateView):
         return reverse_lazy('home')
 
     def form_valid(self, form):
-        valid = super(ProductCreateView,self).form_valid(form)
+        valid = super(ProductCreateView, self).form_valid(form)
         images = self.request.FILES.getlist("images")
 
         if valid:
-            _handle_product_form(self.request, form.instance,images = images)
+            _handle_product_form(self.request, form.instance, images=images)
             if self.request.user.is_staff:
                 form.instance.is_approved = True
                 form.instanceSave()
@@ -147,4 +147,32 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
             _handle_product_form(self.request, form.instance, images=images)
         return valid
 
-#class ProductDeleteView(LoginRequiredMixin,View):
+
+class ProductDeleteView(LoginRequiredMixin,View):
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            info_message = _('You are not allowed for this action. Please sign in as ADMIN.')
+        else:
+            slug = self.kwargs.get("slug")
+            instance = get_object_or_404(Product, slug=slug)
+            instance.is_active = False
+            instance.save()
+            info_message = _('Product has been deleted successfully.')
+
+        messages.add_message(request, messages.INFO, info_message)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+class ProductDeleteRequest(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+
+        pk = self.request.POST.get("id")
+        instance = get_object_or_404(Product, pk=pk)
+        instance.is_deleted = True
+        instance.save()
+        info_message = _('Your delete request has been sent. We will inform you as soon as possible.')
+        messages.add_message(self.request, messages.INFO, info_message)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+

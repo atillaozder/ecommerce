@@ -5,9 +5,11 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from utils.utils import get_upload_path
+from cart.models import CartItem
 from decimal import Decimal
 from django.db.models import Q
 from django.conf import settings
+
 
 # Create your models here.
 User = get_user_model()
@@ -131,10 +133,10 @@ class Product(models.Model):
             return avg
         return 0
 
-    # def update_cart_item(self):
-    # items = CartItem.objects.all().filter(product=self)
-    # for item in items:
-    # item.save()
+    def update_cart_item(self):
+        items = CartItem.objects.all().filter(product=self)
+        for item in items:
+            item.save()
 
     def update_discount_price(self):
         if self.discount > 0:
