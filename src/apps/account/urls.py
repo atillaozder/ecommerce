@@ -19,4 +19,7 @@ urlpatterns = [
     path('account/image/change', UserImageUpdateView.as_view(), name='update_image'),
     path('account/edit', UserUpdateView.as_view(), name='update'),
     path('account/<username>', UserDetailView.as_view(), name='profile'),
+    path('distributors/pending', DistributorPendingListView.as_view(), name='distributors'),
+    path('account/<username>/approve', DistributorApproveView.as_view(), name='approve'),
+    path('account/<username>/reject', DistributorRejectView.as_view(), name='reject'),
 ]
