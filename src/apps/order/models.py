@@ -56,7 +56,7 @@ class Order(models.Model):
                                         null=True,
                                         related_name='+')
 
-    # cart_items = models.ManyToManyField('cart.CartItem')
+    cart_items = models.ManyToManyField('cart.CartItem')
 
     status = models.CharField(_('Status'),
                               max_length=120,

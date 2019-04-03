@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404
+from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404, Http404
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
@@ -19,6 +19,7 @@ from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN
 )
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm
 from django.views.generic import View, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -213,3 +214,63 @@ class UserImageUpdateView(LoginRequiredMixin, View):
             user.image = image
             user.save()
         return redirect(user.get_absolute_url())
+
+
+class DistributorPendingListView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        if not self.request.user.is_staff:
+            raise Http404
+
+        qs = Distributor.objects.filter(is_approved=False, user__is_active=True)
+        if not Distributor._meta.ordering:
+            qs = qs.order_by('pk')
+
+        context = {}
+        if qs.exists():
+            context = {}
+            page = request.GET.get('page', 1)
+            paginator = Paginator(qs, 10)
+            try:
+                instances = paginator.page(page)
+            except PageNotAnInteger:
+                instances = paginator.page(1)
+            except EmptyPage:
+                instances = paginator.page(paginator.num_pages)
+
+            context['distributors'] = instances
+        return render(request, 'distributor_pending.html', context)
+
+
+class DistributorApproveView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        if not self.request.user.is_staff:
+            info_message = _('You need to sign as ADMIN to do this action.')
+        else:
+            username = self.kwargs.get('username')
+            instance = get_object_or_404(User, username=username)
+            instance.distributor.is_approved = True
+            instance.distributor.save()
+            info_message = _('Distributor has been approved.')
+
+        messages.add_message(request, messages.INFO, info_message)
+        return redirect('users:distributors')
+
+
+class DistributorRejectView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        if not self.request.user.is_staff:
+            info_message = _('You need to sign as ADMIN to do this action.')
+        else:
+            username = self.kwargs.get('username')
+            instance = get_object_or_404(User, username=username)
+            instance.is_active = False
+            instance.save()
+            instance.distributor.is_approved = False
+            instance.distributor.save()
+            info_message = _('Distributor has been rejected.')
+
+        messages.add_message(request, messages.INFO, info_message)
+        return redirect('users:distributors')
