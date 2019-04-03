@@ -4,7 +4,7 @@ from django.shortcuts import render, Http404, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 
-from order.models import Order
+from .models import Order
 
 class OrderListView(LoginRequiredMixin, ListView):
     paginate_by = 10
@@ -12,7 +12,7 @@ class OrderListView(LoginRequiredMixin, ListView):
     template_name = 'order_list.html'
 
     def get(self, request, *args, **kwargs):
-        if not request.user.user_type == 'customer' or request.user.is_staff:
+        if not request.user.type == 'customer' or request.user.is_staff:
             raise Http404
         return super(OrderListView, self).get(request, *args, **kwargs)
 

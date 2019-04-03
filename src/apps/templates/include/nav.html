@@ -25,7 +25,7 @@
         <div class="dropdown-menu mt-1" aria-labelledby="profileDropdown">
           <a class="dropdown-item" href="{% url 'users:profile' request.user.username %}">{% trans "Profile" %}</a>
           {% if request.user.type == 'customer' and not request.user.is_staff %}
-          <a class="dropdown-item" href="#">{% trans "Previous Orders" %}</a>
+          <a class="dropdown-item" href="{% url 'orders:list' %}">{% trans "Previous Orders" %}</a>
           {% endif %}
           <a class="dropdown-item" href="#">{% trans "Settings" %}</a>
           <div class="dropdown-divider"></div>
