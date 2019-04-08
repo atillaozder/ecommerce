@@ -1,10 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 
-</body>
-</html>
+{% block title %}{% trans "Order" %} | {{ order.order_id }}{% endblock title %}
+{% block content %}
+<section class="section-content bg padding-y border-top">
+	<div class="container">
+		<nav class="mb-4 mt-3">
+		  <ol class="breadcrumb">
+		      <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+		      <li class="breadcrumb-item"><a href="{% url 'orders:list' %}">{% trans "Previous Orders" %}</a></li>
+		      <li class="breadcrumb-item active">{{ order.order_id }}</li>
+		  </ol>
+		</nav>
+		<div class="row">
+			<main class="col-md-8 mb-4">
+				<div class="card">
+					<table class="table shopping-cart-wrap">
+						<thead class="text-muted">
+							<tr>
+								<th scope="col" width="10%">{% trans "Product" %}</th>
+								<th scope="col" width="53%">{% trans "" %}</th>
+								<th scope="col" width="12%">{% trans "Quantity" %}</th>
+								<th scope="col" width="15%">{% trans "Price" %}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for product in products %}
+							<tr>
+								<td>
+									<figure class="media">
+										<div class="img-wrap">
+											<img src="{{ product.get_first_image_url }}" alt="{{ product.name }}"
+													class="img-thumbnail img-sm">
+										</div>
+									</figure>
+								</td>
+								<td>
+									<h6 class="title">
+										{{ product.name }}
+									</h6>
+								</td>
+								<td>
+									{% for cart_item in order.cart_items.all %}
+											{% if product == cart_item.product %}
+												<p class="mt-2">{{ cart_item.quantity }}</p>
+											{% endif %}
+									{% endfor %}
+								</td>
+								<td>
+									<div class="price-wrap mt-2">
+										<var class="price text-dark">
+											{% for cart_item in order.cart_items.all  %}
+													{% if product == cart_item.product %}
+															${{ cart_item.item_total }}
+													{% endif %}
+											{% endfor %}
+										</var>
+									</div> <!-- price-wrap .// -->
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div> <!-- card.// -->
+			</main> <!-- col.// -->
+			<aside class="col-md-4">
+				<h5 class="title">{% trans "Order Information" %}</h5>
+				<dl class="dlist-align">
+					<dt>{% trans "Order ID" %}: </dt>
+					<dd class="text-right">{{ order.order_id }}</dd>
+				</dl>
+				<dl class="dlist-align">
+					<dt>{% trans "Order Date" %}: </dt>
+					<dd class="text-right">{{ order.timestamp }}</dd>
+				</dl>
+				<dl class="dlist-align">
+					<dt>{% trans "Customer" %}: </dt>
+					<dd class="text-right">{{ order.user.get_full_name }}</dd>
+				</dl>
+				<dl class="dlist-align">
+					<dt>{% trans "Status" %}: </dt>
+					<dd class="text-right text-success">{{ order.get_status_display|upper }}</dd>
+				</dl>
+				<h5 class="title mt-4">{% trans "Address Information" %}</h5>
+				<div class="row mt-3">
+					<div class="col-lg-6 mb-3">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="title">{% trans "Billing Address" %}</h5>
+								<p class="text-muted">{{ order.billing_address.get_country_display }} {{ order.billing_address.get_address }}</p>
+								<p class="text-muted">{% trans "Additional Notes: " %}{{ order.billing_address.notes }}</p>
+							</div>
+						</div> <!-- card // -->
+					</div> <!-- col // -->
+					<div class="col-lg-6">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="title">{% trans "Shipping Address" %}</h5>
+								<p class="text-muted">{{ order.shipping_address.get_country_display }} {{ order.shipping_address.get_address }}</p>
+								<p class="text-muted">{% trans "Additional Notes: " %}{{ order.shipping_address.notes }}</p>
+							</div>
+						</div> <!-- card // -->
+					</div> <!-- col // -->
+				</div> <!-- row.// -->
+				<hr>
+				<dl class="dlist-align h4">
+					<dt>{% trans "Total" %}: </dt>
+					<dd class="text-right"><strong>${{ order.total }}</strong></dd>
+				</dl>
+			</aside> <!-- col.// -->
+		</div>
+	</div> <!-- container .//  -->
+</section>
+{% endblock content %}
+
+
+{% block script %}
+<script type="text/javascript">
+		$(':input').on('keyup change click', function() {
+			var value = parseInt($(this).val());
+			if (value) {
+				if (value < 0 || $(this).val().startsWith(0)) {
+					$(this).val(0);
+				}
+
+				var max = parseInt($(this).attr("max"));
+				if (value > max) {
+					$(this).val(max);
+				}
+			}
+		});
+</script>
+{% endblock script %}

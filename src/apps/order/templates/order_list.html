@@ -20,7 +20,7 @@
                   <h5 class="title">{% trans "Order Information" %}</h5>
                   <dl class="dlist-align">
                     <dt>{% trans "Order ID" %}: </dt>
-                    <dd class="text-right"><a href="#">{{ order.order_id }}</a></dd>
+                    <dd class="text-right"><a href="{{ order.get_absolute_url }}">{{ order.order_id }}</a></dd>
                   </dl>
                   <dl class="dlist-align">
                     <dt>{% trans "Order Date" %}: </dt>
