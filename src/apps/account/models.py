@@ -75,7 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                 validators=[username_validator],
                                 error_messages={'unique': _('The username is already exists')})
 
-    email = models.CharField(_('Email'), max_length=255, unique=True)
+    email = models.EmailField(_('Email'), max_length=255, unique=True)
     first_name = models.CharField(_('First Name'), max_length=150)
     last_name = models.CharField(_('Last Name'), max_length=150)
     date_joined = models.DateTimeField(_('Date Joined'), default=timezone.now)
@@ -105,9 +105,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     width_field = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Image Width')
     height_field = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Image Height')
 
-    # addresses       = models.ManyToManyField('address.Address', blank=True, related_name='user_addresses')
-    # shipping        = models.ForeignKey('address.Address', related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
-    # billing         = models.ForeignKey('address.Address', related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
+    addresses = models.ManyToManyField('address.Address', blank=True, related_name='user_addresses')
+    shipping = models.ForeignKey('address.Address', related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
+    billing = models.ForeignKey('address.Address', related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'

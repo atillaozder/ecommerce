@@ -23,11 +23,11 @@
           </span>
         </button>
         <div class="dropdown-menu mt-1" aria-labelledby="profileDropdown">
-          <a class="dropdown-item" href="{% url 'users:profile' request.user.username %}">{% trans "Profile" %}</a>
+          <a class="dropdown-item" href="{{ request.user.get_absolute_url }}">{% trans "Profile" %}</a>
           {% if request.user.type == 'customer' and not request.user.is_staff %}
           <a class="dropdown-item" href="{% url 'orders:list' %}">{% trans "Previous Orders" %}</a>
           {% endif %}
-          <a class="dropdown-item" href="#">{% trans "Settings" %}</a>
+          <a class="dropdown-item" href="{{ request.user.get_absolute_url }}">{% trans "Settings" %}</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="{% url 'users:logout' %}">{% trans "Sign out" %}</a>
         </div>
@@ -59,8 +59,6 @@
           </span>
         </a>
       {% endif %}
-
-
     {% else %}
       <div class="col-lg-6-24 col-sm-7 col-8 order-2 order-lg-3">
         <div class="d-flex justify-content-end">

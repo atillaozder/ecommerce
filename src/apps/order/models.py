@@ -9,6 +9,7 @@ import string
 
 User = get_user_model()
 
+
 class OrderQuerySet(models.query.QuerySet):
     def recent(self):
         return self.order_by("-updated", "-timestamp")
@@ -24,15 +25,17 @@ class OrderQuerySet(models.query.QuerySet):
             return self.filter(updated__gte=start_date)
         return self.filter(updated__gte=start_date).filter(updated__lte=end_date)
 
+
 class OrderManager(models.Manager):
     def get_queryset(self):
         return OrderQuerySet(self.model, using=self._db)
 
+
 class Order(models.Model):
-    CREATED 	= _('created')
-    PAID 		= _('paid')
-    SHIPPED 	= _('shipped')
-    REFUNDED	= _('refunded')
+    CREATED = _('created')
+    PAID = _('paid')
+    SHIPPED = _('shipped')
+    REFUNDED = _('refunded')
 
     ORDER_STATUS_CHOICES = (
         (CREATED, _('Created')),
@@ -91,7 +94,7 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse("orders:detail", kwargs={'order_id': self.order_id})
 
-    def _order_id_generator(self, new_order_id=None):
+    def order_id_generator(self, new_order_id=None):
         if new_order_id is not None:
             randstr = new_order_id
         else:
@@ -102,7 +105,8 @@ class Order(models.Model):
             return self.order_id_generator(self, new_order_id=new_order_id)
         self.order_id = randstr
 
+
 @receiver(pre_save, sender=Order)
 def order_pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.order_id:
-        instance._order_id_generator()
+        instance.order_id_generator()

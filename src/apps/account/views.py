@@ -124,7 +124,7 @@ class UserPasswordResetView(PasswordResetView):
             'extra_email_context': self.extra_email_context,
         }
 
-        form.save(**opts)
+        # form.save(**opts)
         valid = super().form_valid(form)
         if valid:
             info_message = _("Check your inbox. We've emailed you "
@@ -148,8 +148,8 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
 
     def form_valid(self, form):
         user = form.save()
-        if INTERNAL_RESET_SESSION_TOKEN in self.request.session:
-            del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
+        # if INTERNAL_RESET_SESSION_TOKEN in self.request.session:
+            # del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
 
         if self.post_reset_login:
             auth_login(self.request, user, self.post_reset_login_backend)
@@ -173,8 +173,8 @@ class UserDetailView(View):
         context = {}
         if username:
             user = get_object_or_404(User, username=username)
-            if isinstance(user, Distributor):
-                qs = Product.objects.filter(user=user.distributor)
+            if hasattr(user, 'distributor'):
+                qs = Product.objects.filter(distributor=user)
                 context['products'] = qs
             context['object'] = user
         return render(request, "user_profile.html", context)
@@ -182,11 +182,11 @@ class UserDetailView(View):
 
 class UserDeleteView(LoginRequiredMixin, View):
 
-    def post(self):
-        user = self.request.user
+    def post(self, request, *args, **kwargs):
+        user = request.user
         user.is_active = False
-        auth_logout(user)
         user.save()
+        auth_logout(request)
         return redirect('users:login')
 
 

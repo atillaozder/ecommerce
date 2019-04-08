@@ -4,6 +4,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField, SetPasswordForm
 from django.utils.translation import gettext_lazy as _
 from .utils import password_validators_help_text_html
 from .models import Distributor
+from cart.models import Cart
 
 User = get_user_model()
 
@@ -90,6 +91,7 @@ class UserRegisterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'autocomplete': 'off'})
         for _, f in self.fields.items():
             f.widget.attrs['class'] = 'form-control'
 
@@ -126,11 +128,16 @@ class UserRegisterForm(forms.ModelForm):
             raise forms.ValidationError(self.error_messages['email_exists'])
         return email
 
-    def clean_password(self):
+    def clean_confirm_password(self):
         password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
-        if password and confirm_password and password != confirm_password:
+        print(self.cleaned_data)
+
+        if not password or not confirm_password:
+            raise forms.ValidationError(self.error_messages['password_mismatch'])
+
+        if password != confirm_password:
             raise forms.ValidationError(self.error_messages['password_mismatch'])
 
         if len(password) < 8 or len(password) > 30:
@@ -145,8 +152,8 @@ class UserRegisterForm(forms.ModelForm):
 
         if commit:
             user.save()
-            # user_cart = Cart.objects.create(user=user)
-            # user_cart.save()
+            user_cart = Cart.objects.create(user=user)
+            user_cart.save()
             if user.is_distributor():
                 d = Distributor.objects.create(user=user)
                 d.save()

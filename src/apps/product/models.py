@@ -10,8 +10,6 @@ from decimal import Decimal
 from django.db.models import Q
 from django.conf import settings
 
-
-# Create your models here.
 User = get_user_model()
 
 

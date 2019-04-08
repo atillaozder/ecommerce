@@ -5,8 +5,7 @@ from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
-from .models import Cart, CartItem
-from product.models import Product
+from .models import CartItem
 from order.models import Order
 
 
@@ -50,9 +49,12 @@ class CheckoutDoneView(LoginRequiredMixin, View):
         if billing is not None and shipping is not None:
             cart = user.shopping_cart
             cart_items = cart.cartitem_set.all()
-            order = Order.objects.create(user=user, billing_address=billing,
-                                       shipping_address=shipping, 
-total=cart.total)
+            order = Order.objects.create(
+                user=user,
+                billing_address=billing,
+                shipping_address=shipping,
+                total=cart.total
+            )
 
             for item in cart_items:
                 product = item.product
