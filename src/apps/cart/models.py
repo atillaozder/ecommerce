@@ -19,7 +19,7 @@ class CartItem(models.Model):
         unique_together = ['cart', 'product']
 
     def __str__(self):
-        return self.is_active
+        return self.product.__str__()
 
     def update_item_total_price(self):
         qts = self.quantity

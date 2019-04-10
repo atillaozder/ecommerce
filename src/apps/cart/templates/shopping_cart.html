@@ -146,7 +146,9 @@
 				if (value > max) {
 					$(this).val(max);
 				}
-			}
+			} else {
+			    $(this).val(0);
+            }
 		});
 </script>
 {% endblock script %}

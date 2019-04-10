@@ -11,41 +11,41 @@ from order.models import Order
 
 class CartView(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_staff or not request.user.user_type == 'customer':
+    def get(self, request):
+        if request.user.is_staff or not request.user.type == 'customer':
             raise Http404
-        instance = request.user.shopping_cart
+        instance = self.request.user.shopping_cart
         return render(request, 'shopping_cart.html', {'cart': instance})
 
 
 class CheckoutView(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_staff or not request.user.user_type == 'customer':
+    def get(self, request):
+        if request.user.is_staff or not request.user.type == 'customer':
             raise Http404
 
         cart = request.user.shopping_cart
         addresses = request.user.addresses.all()
-        shipping_address = request.user.shipping_address
-        billing_address = request.user.billing_address
+        shipping = request.user.shipping
+        billing = request.user.billing
         context = {
             'cart': cart,
             'addresses': addresses,
-            'shipping': shipping_address,
-            'billing': billing_address,
+            'shipping': shipping,
+            'billing': billing,
         }
         return render(request, 'checkout.html', context)
 
 
 class CheckoutDoneView(LoginRequiredMixin, View):
 
-    def post(self, request, *args, **kwargs):
-        if request.user.is_staff or not request.user.user_type == 'customer':
+    def post(self, request):
+        if request.user.is_staff or not request.user.type == 'customer':
             raise Http404
 
         user = request.user
-        billing = user.billing_address
-        shipping = user.shipping_address
+        billing = user.billing
+        shipping = user.shipping
         if billing is not None and shipping is not None:
             cart = user.shopping_cart
             cart_items = cart.cartitem_set.all()

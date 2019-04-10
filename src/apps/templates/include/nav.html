@@ -34,7 +34,7 @@
       </li>
 
       {% if request.user.type == 'customer' and not request.user.is_staff %}
-        <a href="#" role="button" aria-pressed="true"
+        <a href="{% url 'carts:detail' %}" role="button" aria-pressed="true"
           class="btn btn-secondary d-none d-sm-block bg-secondary" id="userBasket"
           style="padding: 8px 0 8px 10px;">
           <span class="float-left mr-3 mt-1">
