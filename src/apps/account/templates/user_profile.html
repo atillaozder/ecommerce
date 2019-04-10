@@ -84,14 +84,13 @@
 										</span>
 										<figcaption class="text-wrap">
 											<h5 class="title">{% trans "Current Billing" %}</h5>
-                                            {% if request.user.billing_address %}
-      											<p class="text-muted">{{ request.user.billing_address.get_country_display }}</p>
-											    <p class="text-muted">{{ request.user.billing_address.get_address }}</p>
-											    <p class="text-muted">{{ request.user.billing_address.notes }}</p>
+                                            {% if request.user.billing %}
+      											<p class="text-muted">{{ request.user.billing.get_country_display }}</p>
+											    <p class="text-muted">{{ request.user.billing.get_address }}</p>
+											    <p class="text-muted">{{ request.user.billing.notes }}</p>
                                             {% else %}
                                                 <p class="text-muted">{% trans "Current Billing is not set." %}</p>
                                             {% endif %}
-
 										</figcaption>
 									</figure>
 								</article>
@@ -104,10 +103,10 @@
 										</span>
 										<figcaption class="text-wrap">
 											<h5 class="title">{% trans "Current Shipping" %}</h5>
-                                            {% if request.user.shipping_address %}
-                                                <p class="text-muted">{{ request.user.shipping_address.get_country_display }}</p>
-											    <p class="text-muted">{{ request.user.shipping_address.get_address }}</p>
-											    <p class="text-muted">{{ request.user.shipping_address.notes }}</p>
+                                            {% if request.user.shipping %}
+                                                <p class="text-muted">{{ request.user.shipping.get_country_display }}</p>
+											    <p class="text-muted">{{ request.user.shipping.get_address }}</p>
+											    <p class="text-muted">{{ request.user.shipping.notes }}</p>
                                             {% else %}
                                                 <p class="text-muted">{% trans "Current Shipping is not set." %}</p>
                                             {% endif %}
@@ -142,15 +141,19 @@
 											<p class="text-muted">{{ address.notes }}</p>
 											</figcaption>
 										</figure>
-										<form action="{% url 'users:set_address' %}" method="post">
+										<form action="{% url 'users:update_address' %}" method="post">
 											{% csrf_token %}
-											<input type="hidden" name="id" value="{{ address.pk }}">
-											<button type="submit" name="shipping" class="btn btn-block btn-warning text-white">
-												{% trans "Set as current shipping" %}
-											</button>
-											<button type="submit" name="billing" class="btn btn-block btn-success">
-												{% trans "Set as current billing" %}
-											</button>
+											<input type="hidden" name="address_pk" value="{{ address.pk }}">
+                                            {% if address.pk != request.user.shipping.pk %}
+                                                <button type="submit" name="shipping" class="btn btn-block btn-warning text-white">
+                                                    {% trans "Set as current shipping" %}
+                                                </button>
+                                            {% endif %}
+                                            {% if address.pk != request.user.billing.pk %}
+                                                <button type="submit" name="billing" class="btn btn-block btn-success">
+                                                    {% trans "Set as current billing" %}
+                                                </button>
+                                            {% endif %}
 										</form>
 									</article>
 								</div>

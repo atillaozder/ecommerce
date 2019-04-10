@@ -25,6 +25,7 @@ from django.views.generic import View, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Distributor
 from product.models import Product
+from address.models import Address
 
 User = get_user_model()
 
@@ -216,9 +217,24 @@ class UserImageUpdateView(LoginRequiredMixin, View):
         return redirect(user.get_absolute_url())
 
 
+class UserAddressUpdateView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        user = request.user
+        pk = self.request.POST.get("address_pk", None)
+        shipping = self.request.POST.get("shipping", None)
+        address = get_object_or_404(Address, pk=pk)
+        if shipping is not None:
+            user.shipping = address
+        else:
+            user.billing = address
+        user.save()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 class DistributorPendingListView(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         if not self.request.user.is_staff:
             raise Http404
 
@@ -274,3 +290,4 @@ class DistributorRejectView(LoginRequiredMixin, View):
 
         messages.add_message(request, messages.INFO, info_message)
         return redirect('users:distributors')
+

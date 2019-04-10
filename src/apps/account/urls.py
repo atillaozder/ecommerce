@@ -17,6 +17,7 @@ urlpatterns = [
     path('', include(registration_patterns)),
     path('account/delete', UserDeleteView.as_view(), name='delete'),
     path('account/image/change', UserImageUpdateView.as_view(), name='update_image'),
+    path('account/address/edit', UserAddressUpdateView.as_view(), name='update_address'),
     path('account/edit', UserUpdateView.as_view(), name='update'),
     path('account/<username>', UserDetailView.as_view(), name='profile'),
     path('distributors/pending', DistributorPendingListView.as_view(), name='distributors'),

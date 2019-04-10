@@ -9,6 +9,7 @@ from .models import Distributor
 User = get_user_model()
 admin.site.unregister(Group)
 
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
@@ -41,10 +42,10 @@ class UserAdmin(BaseUserAdmin):
             'fields': (
                 'first_name',
                 'last_name',
-                # 'addresses',
+                'addresses',
                 'type',
-                # 'shipping',
-                # 'billing',
+                'shipping',
+                'billing',
                 'image',
                 'width_field',
                 'height_field'
@@ -67,6 +68,6 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Distributor)
 class DistributorAdmin(admin.ModelAdmin):
-    list_display  = ('user', 'is_approved')
+    list_display = ('user', 'is_approved')
     list_editable = ('is_approved',)
-    list_filter   = ('is_approved',)
+    list_filter = ('is_approved',)
