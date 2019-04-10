@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Address
 
+
 class AddressForm(forms.ModelForm):
     field_order = ['country', 'city', 'address_line', 'postal_code', 'notes']
 
@@ -10,22 +11,22 @@ class AddressForm(forms.ModelForm):
         super(AddressForm, self).__init__(*args, **kwargs)
         self.fields['country'].widget.attrs.update({
             'placeholder': _('Country'),
-            'class' : 'form-control',
+            'class': 'form-control',
         })
         self.fields['city'].widget.attrs.update({
-            'class' : 'form-control',
+            'class': 'form-control',
             'placeholder': _('City'),
         })
         self.fields['address_line'].widget.attrs.update({
-            'class' : 'form-control',
+            'class': 'form-control',
             'placeholder': _('Address Information'),
         })
         self.fields['postal_code'].widget.attrs.update({
-            'class' : 'form-control',
+            'class': 'form-control',
             'placeholder': _('Postal Code'),
         })
         self.fields['notes'].widget.attrs.update({
-            'class' : 'form-control',
+            'class': 'form-control',
             'placeholder': _('Additional Notes'),
         })
 

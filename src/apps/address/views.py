@@ -7,6 +7,7 @@ from django.http import Http404
 from .models import Address
 from .forms import AddressForm
 
+
 class AddressCreateView(LoginRequiredMixin, CreateView):
     template_name = 'address_form.html'
     form_class = AddressForm
@@ -29,6 +30,7 @@ class AddressCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('users:profile', kwargs={'username': self.request.user.username})
 
+
 class AddressUpdateView(LoginRequiredMixin, UpdateView):
     model = Address
     template_name = 'address_form.html'
@@ -41,6 +43,7 @@ class AddressUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('users:profile', kwargs={'username': self.request.user.username})
+
 
 class AddressDeleteView(LoginRequiredMixin, View):
 

@@ -8,8 +8,6 @@ from .views import (
 
 app_name = 'address'
 
-
-
 urlpatterns = [
     path('create', AddressCreateView.as_view(), name='create'),
     path('update/<pk>', AddressUpdateView.as_view(), name='update'),
