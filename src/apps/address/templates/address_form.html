@@ -1,10 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load i18n %}
 
-</body>
-</html>
+{% block title %}{{ request.user.username }} | {% trans "Address" %}{% endblock title %}
+{% block content %}
+
+<div class="container">
+  <nav class="mb-4 mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ request.user.get_absolute_url }}">{% trans "My Profile" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Edit Address" %}</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-2">
+      <div class="card">
+        <article class="card-body">
+          <h5 class="card-title text-center">{% trans "New Address" %}</h5>
+          <hr>
+          <form method="post">
+            {% csrf_token %}
+            {% if form.visible_fields %}
+                {% csrf_token %}
+                {% for field in form.visible_fields %}
+                <div class="form-group">
+                  <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                  <div class="input-group">
+                    {{ field }}
+                  </div>
+                </div>
+                <p class="text-danger">
+                  {% for error in field.errors %}
+                      {{ error|escape }}
+                  {% endfor %}
+                </p>
+                {% endfor %}
+            {% endif %}
+            <p class="text-danger">
+              {% for non_field_error in form.non_field_errors  %}
+                {{ non_field_error|striptags|escape }}
+              {% endfor %}
+              {% for hidden_field in form.hidden_fields %}
+                {% for error in hidden_field.errors %}
+                    {{ error|striptags|escape }}
+                {% endfor %}
+              {% endfor %}
+            </p>
+            <div class="form-group text-center">
+              <button type="submit" class="btn btn-danger btn-block"> {% trans "Submit" %}  </button>
+            </div>
+          </form>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

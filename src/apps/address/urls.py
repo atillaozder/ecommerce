@@ -1,10 +1,17 @@
 from django.urls import path
-from .views import *
+
+from .views import (
+    AddressCreateView,
+    AddressDeleteView,
+    AddressUpdateView,
+)
 
 app_name = 'address'
 
+
+
 urlpatterns = [
-    path('create', AddressView.as_view(), name='create'),
-    path('update/<pk>', AddressView.as_view(), name='update'),
-    path('delete', AddressView.as_view(), name='delete'),
+    path('create', AddressCreateView.as_view(), name='create'),
+    path('update/<pk>', AddressUpdateView.as_view(), name='update'),
+    path('delete', AddressDeleteView.as_view(), name='delete'),
 ]
