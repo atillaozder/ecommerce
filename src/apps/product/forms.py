@@ -28,10 +28,6 @@ class ProductForm(forms.ModelForm):
         self.fields['category'].widget.attrs.update({
             'class': 'form-control',
         })
-        self.fields['essential_product'].widget.attrs.update({
-            'class': 'form-control',
-        })
-
         self.fields['description'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': _('Description'),
@@ -47,10 +43,6 @@ class ProductForm(forms.ModelForm):
         self.fields['stock'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': _('Stock'),
-        })
-        self.fields['weight'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': _('Weight'),
         })
 
     class Meta:

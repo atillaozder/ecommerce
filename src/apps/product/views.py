@@ -38,14 +38,6 @@ def _handle_product_form(request, product, images=None):
     if images is not None and len(images) > 4:
         raise ValidationError(_('Please select maximum 4 images for the product.'))
 
-    if product.brand:
-        user = request.user
-        qs_exists = user.distributor.brands.all().filter(pk=product.brand.pk).exists()
-        if not qs_exists and not user.is_staff:
-            raise ValidationError(_('Please select a brand that you distribute: %(value)s'),
-                                  code='invalid',
-                                  params={'value': product.brand},)
-
     queryset = ProductImage.objects.all().filter(product=product)
     if queryset.exists():
         for obj in queryset:
@@ -72,7 +64,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
             _handle_product_form(self.request, form.instance, images=images)
             if self.request.user.is_staff:
                 form.instance.is_approved = True
-                form.instanceSave()
+                form.instance.save()
             return valid
 
 
@@ -80,7 +72,7 @@ class ProductApprovePendingListView(LoginRequiredMixin, ListView):
     queryset = Product.objects.all().pending()
     paginate_by = 10
     context_object_name = 'products'
-    #template_name = 'product_pending_approve.html'
+    template_name = 'product_pending_approve.html'
 
     def get_context_data(self, *args, **kwargs):
         if self.request.user.is_staff:
