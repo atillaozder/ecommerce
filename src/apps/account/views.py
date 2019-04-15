@@ -20,8 +20,8 @@ from django.contrib.auth.views import (
 )
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm
-from django.views.generic import View, CreateView
+from .forms import UserPasswordChangeForm, UserSetPasswordForm, UserRegisterForm, UserUpdateForm
+from django.views.generic import View, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Distributor
 from product.models import Product
@@ -191,19 +191,12 @@ class UserDeleteView(LoginRequiredMixin, View):
         return redirect('users:login')
 
 
-class UserUpdateView(LoginRequiredMixin, View):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'user_update.html'
+    form_class = UserUpdateForm
 
-    def get(self, request):
-        return render(request, "user_update.html", {})
-
-    def post(self, request):
-        user = self.request.user
-        first_name = request.POST.get("first_name", "")
-        last_name = request.POST.get("last_name", "")
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-        return redirect(user.get_absolute_url())
+    def get_object(self):
+        return self.request.user
 
 
 class UserImageUpdateView(LoginRequiredMixin, View):

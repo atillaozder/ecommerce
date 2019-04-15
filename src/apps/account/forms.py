@@ -161,6 +161,38 @@ class UserRegisterForm(forms.ModelForm):
         return user
 
 
+class UserUpdateForm(forms.ModelForm):
+    field_order = ['first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control'
+        })
+        self.fields['first_name'].widget.attrs.update({
+            'class' : 'form-control',
+            'placeholder': _('First Name')
+        })
+        self.fields['last_name'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': _('Last name')
+        })
+
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+        ]
+
+    def save(self, commit=True):
+        user = super(UserUpdateForm, self).save(commit=False)
+        if commit:
+            user.save()
+        return user
+
+
 class UserSetPasswordForm(SetPasswordForm):
     new_password1 = forms.CharField(
         label=_("New password"),
