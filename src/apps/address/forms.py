@@ -24,6 +24,7 @@ class AddressForm(forms.ModelForm):
         self.fields['postal_code'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': _('Postal Code'),
+            'pattern': '[0-9]+'
         })
         self.fields['notes'].widget.attrs.update({
             'class': 'form-control',
