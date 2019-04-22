@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ products.count }} | {% trans "result" %}{% endblock title %}
+{% block content %}
+<section class="section-content bg padding-y border-top">
+	<div class="container">
+		<nav class="mb-4 mt-3">
+			<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+					<li class="breadcrumb-item active" aria-current="page">{% trans "Search" %}</li>
+			</ol>
+		</nav>
+		<div class="row">
+            <div class="col-md-12">
+                <div class="padding-y-sm">
+                    <h5>{{ products.count }} results for {{ q }}</h5>
+                </div>
+                <div class="row-sm">
+                    {% for p in products %}
+                        <div class="col-md-3">
+                            <figure class="card card-product">
+                                {% if p.is_todays_product %}
+                                    <span class="badge-new"> {% trans "NEW" %} </span>
+                                {% endif %}
+                                {% if p.stock == 0 %}
+                                    <span class="badge-new"> {% trans "NO STOCK" %} </span>
+                                {% endif %}
+                                {% if p.discount > 0 %}
+                                    <span class="badge-offer"><b>{{ p.discount }}%</b></span>
+                                {% endif %}
+                                <div class="img-wrap">
+                                    <img src="{{ p.get_first_image_url }}" alt="{{ p.name }}">
+                                </div>
+                                <figcaption class="info-wrap">
+                                    <a href="{{ p.get_absolute_url }}" class="title">{{ p.name }}</a>
+                                    <div class="action-wrap">
+                                        <div class="row">
+                                            <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                                <div class="price-wrap h5">
+                                                    {% if p.discount > 0 %}
+                                                        <del class="price-old">${{p.price}}</del>
+                                                    {% endif %}
+                                                    <span class="price-new">${{p.discount_price}}</span>
+                                                </div> <!-- price-wrap.// -->
+                                            </div>
+                                          {% if request.user.user_type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                          <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                            <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="id" value="{{ p.pk }}">
+                                                <button class="btn btn-outline-danger float-right" type="submit">
+                                                    {% trans "Add to cart" %}
+                                                </button>
+                                            </form>
+                                          </div>
+                                          {% endif %}
+                                        </div>
+                                    </div> <!-- action-wrap -->
+                                </figcaption>
+                            </figure> <!-- card // -->
+                        </div> <!-- col // -->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

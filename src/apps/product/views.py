@@ -16,6 +16,7 @@ from django.views.generic import (
 from django.utils.translation import gettext_lazy as _
 from cart.models import CartItem
 from decimal import Decimal
+from django.db.models import Q
 
 
 class ProductDetailView(DetailView):
@@ -262,5 +263,24 @@ class ProductRateView(LoginRequiredMixin, View):
         info_message = _('Thank you for your vote.')
         messages.add_message(self.request, messages.INFO, info_message)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+class ProductFilterView(View):
+
+    def get(self, request):
+        q = self.request.GET.get("q")
+        qs = Product.objects.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q) |
+            Q(category__name__icontains=q) |
+            Q(distributor__username__icontains=q)
+        )
+
+        context = {
+            'q': q,
+            'products': qs
+        }
+
+        return render(request, 'product_list.html', context)
 
 

@@ -8,20 +8,20 @@
     <div class="container d-flex flex-column" style="min-height:20vh;">
         <div class="row mt-auto">
             <div class="col-lg-9 col-md-8 col-sm-12 mx-auto text-center">
-                <form class="form-noborder" method="GET">
+                <form class="form-noborder" method="GET" action="{% url 'products:search' %}">
                     <div class="form-row mb-5 my-4">
-                        <div class="col-lg-6 col-sm-12 form-group">
+                        <div class="col-lg-10 col-sm-12 form-group">
                             <input class="form-control form-control-lg" name="q" placeholder="{% trans 'Search...' %}" type="text">
                         </div>
-                        <div class="col-lg-3 col-sm-12 form-group">
+                        {% comment %}<div class="col-lg-3 col-sm-12 form-group">
                             <select class="custom-select form-control-lg" name="category">
                                 <option value="all" selected>{% trans "Choose a category" %}</option>
-                            	   <!-- {% for category in categories %}
+                                {% for category in categories %}
                                     <option value="{{ category.slug }}"> {{ category.name }} </option>
-                                {% endfor %} -->
+                                {% endfor %}
                             </select>
-                        </div>
-                        <div class="col-lg-3 col-sm-12 form-group">
+                        </div>{% endcomment %}
+                        <div class="col-lg-2 col-sm-12 form-group">
                             <button class="btn btn-warning btn-block btn-lg" type="submit">{% trans "Search" %}</button>
                         </div>
                     </div>
@@ -31,6 +31,75 @@
     </div>
 </section>
 {% endblock header %}
+
 {% block content %}
+<section class="section-content padding-y">
+    <div class="container">
+        {% for category in categories  %}
+            {% if category.product_set.all.accepted.count > 0 %}
+                <div class="row">
+                    <div class="col">
+                        <h5 class="title-text">
+                            <span> {{ category.name }} ({{ category.product_set.all.accepted.count }})</span>
+                            <a href="#" class="float-right">
+                                <span class="my-2" style="font-size:.8em">{% trans "Show all" %}</span>
+                            </a>
+                        </h5>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="row">
+                {% for p in category.product_set.all.accepted %}
+                    {% if forloop.counter < 5 %}
+                    <div class="col-md-3">
+                        <figure class="card card-product">
+                            {% if p.is_todays_product %}
+                                <span class="badge-new"> {% trans "NEW" %} </span>
+                            {% endif %}
+                            {% if p.stock == 0 %}
+                                <span class="badge-new"> {% trans "NO STOCK" %} </span>
+                            {% endif %}
+                            {% if p.discount > 0 %}
+                                <span class="badge-offer"><b>{{ p.discount }}%</b></span>
+                            {% endif %}
+                            <div class="img-wrap">
+                                <img src="{{ p.get_first_image_url }}" alt="{{ p.name }}">
+                            </div>
+                            <figcaption class="info-wrap">
+                                <a href="{{ p.get_absolute_url }}" class="title">{{ p.name }}</a>
+                                <div class="action-wrap">
+                                    <div class="row">
+                                        <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                            <div class="price-wrap h5">
+                                                {% if p.discount > 0 %}
+                                                    <del class="price-old">${{p.price}}</del>
+                                                {% endif %}
+                                                <span class="price-new">${{p.discount_price}}</span>
+                                            </div> <!-- price-wrap.// -->
+                                        </div>
+                                      {% if request.user.user_type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                      <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                        <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="id" value="{{ p.pk }}">
+                                            <button class="btn btn-outline-danger float-right" type="submit">
+                                                {% trans "Add to cart" %}
+                                            </button>
+                                        </form>
+                                      </div>
+                                      {% endif %}
+                                    </div>
+                                </div> <!-- action-wrap -->
+                            </figcaption>
+                        </figure> <!-- card // -->
+                    </div> <!-- col // -->
+                    {% endif %}
+                {% endfor %}
+            </div> <!-- row.// -->
+        {% endfor %}
+    </div> <!-- container .//  -->
+</section>
 
 {% endblock content %}
+

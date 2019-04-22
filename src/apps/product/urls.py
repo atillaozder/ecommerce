@@ -8,6 +8,7 @@ urlpatterns = [
     path('delete/pending', ProductDeletePendingListView.as_view(), name='delete_pending'),
     path('approve/pending', ProductApprovePendingListView.as_view(), name='approve_pending'),
     path('create', ProductCreateView.as_view(), name="create"),
+    path('search', ProductFilterView.as_view(), name='search'),
     path('<slug>', ProductDetailView.as_view(), name='detail'),
     path('<slug>/add', ProductAddToCartView.as_view(), name='add_to_cart'),
     path('<slug>/remove', ProductRemoveFromCartView.as_view(), name='remove_from_cart'),
