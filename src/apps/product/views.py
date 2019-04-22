@@ -168,3 +168,109 @@ class ProductDeleteRequest(LoginRequiredMixin, View):
         messages.add_message(self.request, messages.INFO, info_message)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+class ProductDeletePendingListView(LoginRequiredMixin, ListView):
+    queryset = Product.objects.all().deleted()
+    paginate_by = 10
+    context_object_name = 'products'
+    template_name = 'product_pending_delete.html'
+
+    def get_context_data(self, *args, **kwargs):
+        if self.request.user.is_staff:
+            return super(ProductDeletePendingListView, self).get_context_data(**kwargs)
+        else:
+            raise Http404
+
+def _update_item_qty_or_add(request, quantity, product=None):
+    if product is not None and quantity < product.stock:
+        cart = request.user.shopping_cart
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product, is_active=True)
+        if created:
+            cart_item.quantity = quantity
+            cart_item.save()
+            return _('Product is added to your basket.')
+        else:
+            new_qty = cart_item.quantity + quantity
+            if new_qty > product.stock:
+                return _('Stock is not enough for quantity amount.')
+            else:
+                cart_item.quantity = new_qty
+                cart_item.save()
+                return _('Quantity amount is updated.')
+    else:
+        return _('Stock is not enough for quantity amount.')
+
+class ProductAddToCartView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.user_type == 'customer':
+            info_message = _('You need to sign in as a CUSTOMER to add items in your basket.')
+            messages.add_message(self.request, messages.INFO, info_message)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+        id = request.POST.get("id")
+        qty = int(request.POST.get("quantity"))
+        product = get_object_or_404(Product, pk=id)
+
+        if product.stock == 0:
+            info_message = _('Product is out of stock.')
+            messages.add_message(self.request, messages.INFO, info_message)
+        else:
+            info_message = _update_item_qty_or_add(request, qty, product=product)
+            messages.add_message(self.request, messages.INFO, info_message)
+
+            if product.essential_product:
+                e_pk = product.essential_product.pk
+                e_product = get_object_or_404(Product, pk=e_pk)
+                _update_item_qty_or_add(request, qty, product=e_product)
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+class ProductRemoveFromCartView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.user_type == 'customer':
+            info_message = _('You need to sign in as a CUSTOMER to remove items from your basket')
+            messages.add_message(self.request, messages.INFO, info_message)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+        id          = request.POST.get("id")
+        product     = get_object_or_404(Product, pk=id)
+        cart        = request.user.shopping_cart
+        cart_item   = get_object_or_404(CartItem, product=product, cart=cart, is_active=True)
+        cart_item.delete()
+
+        if product.essential_product:
+            e_product = product.essential_product
+            qs_exist  = CartItem.objects.filter(product=e_product).filter(cart=cart).filter(is_active=True).exists()
+            if qs_exist:
+                e_cart_it = get_object_or_404(CartItem, product=e_product, cart=cart, is_active=True)
+                e_cart_it.delete()
+
+        info_message = _('Product is removed from your basket.')
+        messages.add_message(self.request, messages.INFO, info_message)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+class ProductRateView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.user_type == 'customer':
+            info_message = _('You need to sign in as a CUSTOMER to rate products')
+            messages.add_message(self.request, messages.INFO, info_message)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+        id      = request.POST.get("id")
+        rate    = Decimal(request.POST.get("rating"))
+        product = get_object_or_404(Product, pk=id)
+        product_like, created = ProductLike.objects.get_or_create(user=request.user, product=product)
+
+        if rate > 10:
+            rate = 10
+
+        product_like.rate = rate
+        product_like.save()
+
+        info_message = _('Thank you for your vote.')
+        messages.add_message(self.request, messages.INFO, info_message)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
