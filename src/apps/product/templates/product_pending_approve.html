@@ -20,10 +20,8 @@
 								<tr>
 									<th scope="col" width="20%">{% trans "Product" %}</th>
 									<th scope="col" width="20%">{% trans "Name" %}</th>
-									<th scope="col" width="15%">{% trans "Essential" %}</th>
 									<th scope="col" width="15%">{% trans "Stock" %}</th>
 									<th scope="col" width="10%">{% trans "Order" %}</th>
-									<th scope="col" width="10%">{% trans "Brand" %}</th>
 									<th scope="col" width="10%">{% trans "" %}</th>
 								</tr>
 							</thead>
@@ -46,16 +44,10 @@
 										</h6>
 									</td>
 									<td>
-										<p>{{ product.essential_product.name }}</p>
-									</td>
-									<td>
 										<p>{{ product.stock }}</p>
 									</td>
 									<td>
 										<p>{{ product.order_amount }}</p>
-									</td>
-									<td>
-										<p>{{ product.brand.name }}</p>
 									</td>
 									<td>
 										<div class="row">

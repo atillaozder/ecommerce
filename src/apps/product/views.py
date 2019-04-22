@@ -1,12 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 from django.urls import reverse_lazy
-from .models import Product
 from django.http import HttpResponseRedirect, Http404
 from django.core.exceptions import ValidationError
 from .models import Product, ProductLike, ProductImage
 from django.contrib import messages
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from .forms import ProductForm
 from django.views.generic import (
     View,
@@ -16,8 +14,8 @@ from django.views.generic import (
     CreateView,
 )
 from django.utils.translation import gettext_lazy as _
-
-# Create your views here.
+from cart.models import CartItem
+from decimal import Decimal
 
 
 class ProductDetailView(DetailView):
@@ -122,7 +120,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         user = self.request.user
         slug = self.kwargs.get("slug")
         instance = get_object_or_404(Product, slug=slug)
-        if user.user_type == 'distributor':
+        if user.type == 'distributor':
             if instance.is_active and not instance.is_deleted:
                 return instance
             else:
@@ -159,7 +157,6 @@ class ProductDeleteView(LoginRequiredMixin,View):
 class ProductDeleteRequest(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-
         pk = self.request.POST.get("id")
         instance = get_object_or_404(Product, pk=pk)
         instance.is_deleted = True
@@ -167,6 +164,7 @@ class ProductDeleteRequest(LoginRequiredMixin, View):
         info_message = _('Your delete request has been sent. We will inform you as soon as possible.')
         messages.add_message(self.request, messages.INFO, info_message)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 class ProductDeletePendingListView(LoginRequiredMixin, ListView):
     queryset = Product.objects.all().deleted()
@@ -179,6 +177,7 @@ class ProductDeletePendingListView(LoginRequiredMixin, ListView):
             return super(ProductDeletePendingListView, self).get_context_data(**kwargs)
         else:
             raise Http404
+
 
 def _update_item_qty_or_add(request, quantity, product=None):
     if product is not None and quantity < product.stock:
@@ -199,17 +198,18 @@ def _update_item_qty_or_add(request, quantity, product=None):
     else:
         return _('Stock is not enough for quantity amount.')
 
+
 class ProductAddToCartView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        if not request.user.user_type == 'customer':
+        if not request.user.type == 'customer':
             info_message = _('You need to sign in as a CUSTOMER to add items in your basket.')
             messages.add_message(self.request, messages.INFO, info_message)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        id = request.POST.get("id")
+        pk = request.POST.get("id")
         qty = int(request.POST.get("quantity"))
-        product = get_object_or_404(Product, pk=id)
+        product = get_object_or_404(Product, pk=pk)
 
         if product.stock == 0:
             info_message = _('Product is out of stock.')
@@ -218,49 +218,39 @@ class ProductAddToCartView(LoginRequiredMixin, View):
             info_message = _update_item_qty_or_add(request, qty, product=product)
             messages.add_message(self.request, messages.INFO, info_message)
 
-            if product.essential_product:
-                e_pk = product.essential_product.pk
-                e_product = get_object_or_404(Product, pk=e_pk)
-                _update_item_qty_or_add(request, qty, product=e_product)
-
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 class ProductRemoveFromCartView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        if not request.user.user_type == 'customer':
+        if not request.user.type == 'customer':
             info_message = _('You need to sign in as a CUSTOMER to remove items from your basket')
             messages.add_message(self.request, messages.INFO, info_message)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        id          = request.POST.get("id")
-        product     = get_object_or_404(Product, pk=id)
-        cart        = request.user.shopping_cart
-        cart_item   = get_object_or_404(CartItem, product=product, cart=cart, is_active=True)
+        pk = request.POST.get("id")
+        product = get_object_or_404(Product, pk=pk)
+        cart = request.user.shopping_cart
+        cart_item = get_object_or_404(CartItem, product=product, cart=cart, is_active=True)
         cart_item.delete()
-
-        if product.essential_product:
-            e_product = product.essential_product
-            qs_exist  = CartItem.objects.filter(product=e_product).filter(cart=cart).filter(is_active=True).exists()
-            if qs_exist:
-                e_cart_it = get_object_or_404(CartItem, product=e_product, cart=cart, is_active=True)
-                e_cart_it.delete()
 
         info_message = _('Product is removed from your basket.')
         messages.add_message(self.request, messages.INFO, info_message)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
 class ProductRateView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        if not request.user.user_type == 'customer':
+        if not request.user.type == 'customer':
             info_message = _('You need to sign in as a CUSTOMER to rate products')
             messages.add_message(self.request, messages.INFO, info_message)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        id      = request.POST.get("id")
-        rate    = Decimal(request.POST.get("rating"))
-        product = get_object_or_404(Product, pk=id)
+        pk = request.POST.get("id")
+        rate = Decimal(request.POST.get("rating"))
+        product = get_object_or_404(Product, pk=pk)
         product_like, created = ProductLike.objects.get_or_create(user=request.user, product=product)
 
         if rate > 10:
