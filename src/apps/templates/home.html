@@ -35,13 +35,133 @@
 {% block content %}
 <section class="section-content padding-y">
     <div class="container">
+        {% if recent.count > 0 %}
+            <div class="row">
+                <div class="col">
+                    <h5 class="title-text">
+                        <span> Recent ({{ recent.count }})</span>
+                    </h5>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            {% for p in recent %}
+            {% if forloop.counter < 5 %}
+                <div class="col-md-3">
+                    <figure class="card card-product">
+                        {% if p.is_todays_product %}
+                            <span class="badge-new"> {% trans "NEW" %} </span>
+                        {% endif %}
+                        {% if p.stock == 0 %}
+                            <span class="badge-new"> {% trans "NO STOCK" %} </span>
+                        {% endif %}
+                        {% if p.discount > 0 %}
+                            <span class="badge-offer"><b>{{ p.discount }}%</b></span>
+                        {% endif %}
+                        <div class="img-wrap">
+                            <img src="{{ p.get_first_image_url }}" alt="{{ p.name }}">
+                        </div>
+                        <figcaption class="info-wrap">
+                            <a href="{{ p.get_absolute_url }}" class="title">{{ p.name }}</a>
+                            <div class="action-wrap">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                        <div class="price-wrap h5">
+                                            {% if p.discount > 0 %}
+                                                <del class="price-old">${{p.price}}</del>
+                                            {% endif %}
+                                            <span class="price-new">${{p.discount_price}}</span>
+                                        </div> <!-- price-wrap.// -->
+                                    </div>
+                                  {% if request.user.type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                  <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                    <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <input type="hidden" name="id" value="{{ p.pk }}">
+                                        <button class="btn btn-outline-danger float-right" type="submit">
+                                            {% trans "Add to cart" %}
+                                        </button>
+                                    </form>
+                                  </div>
+                                  {% endif %}
+                                </div>
+                            </div> <!-- action-wrap -->
+                        </figcaption>
+                    </figure> <!-- card // -->
+                </div> <!-- col // -->
+                {% endif %}
+        {% endfor %}
+        </div>
+        {% if featured.count > 0 %}
+            <div class="row">
+                <div class="col">
+                    <h5 class="title-text">
+                        <span> Featured ({{ featured.count }})</span>
+                        <a href="{% url 'products:featured' %}" class="float-right">
+                            <span class="my-2" style="font-size:.8em">{% trans "Show all" %}</span>
+                        </a>
+                    </h5>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            {% for p in featured %}
+            {% if forloop.counter < 5 %}
+                <div class="col-md-3">
+                    <figure class="card card-product">
+                        {% if p.is_todays_product %}
+                            <span class="badge-new"> {% trans "NEW" %} </span>
+                        {% endif %}
+                        {% if p.stock == 0 %}
+                            <span class="badge-new"> {% trans "NO STOCK" %} </span>
+                        {% endif %}
+                        {% if p.discount > 0 %}
+                            <span class="badge-offer"><b>{{ p.discount }}%</b></span>
+                        {% endif %}
+                        <div class="img-wrap">
+                            <img src="{{ p.get_first_image_url }}" alt="{{ p.name }}">
+                        </div>
+                        <figcaption class="info-wrap">
+                            <a href="{{ p.get_absolute_url }}" class="title">{{ p.name }}</a>
+                            <div class="action-wrap">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                        <div class="price-wrap h5">
+                                            {% if p.discount > 0 %}
+                                                <del class="price-old">${{p.price}}</del>
+                                            {% endif %}
+                                            <span class="price-new">${{p.discount_price}}</span>
+                                        </div> <!-- price-wrap.// -->
+                                    </div>
+                                  {% if request.user.type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                  <div class="col-6 col-md-12 col-lg-6 col-xl-6">
+                                    <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <input type="hidden" name="id" value="{{ p.pk }}">
+                                        <button class="btn btn-outline-danger float-right" type="submit">
+                                            {% trans "Add to cart" %}
+                                        </button>
+                                    </form>
+                                  </div>
+                                  {% endif %}
+                                </div>
+                            </div> <!-- action-wrap -->
+                        </figcaption>
+                    </figure> <!-- card // -->
+                </div> <!-- col // -->
+                {% endif %}
+        {% endfor %}
+        </div>
+
         {% for category in categories  %}
             {% if category.product_set.all.accepted.count > 0 %}
                 <div class="row">
                     <div class="col">
                         <h5 class="title-text">
                             <span> {{ category.name }} ({{ category.product_set.all.accepted.count }})</span>
-                            <a href="#" class="float-right">
+                            <a href="{% url 'products:category' category.slug %}" class="float-right">
                                 <span class="my-2" style="font-size:.8em">{% trans "Show all" %}</span>
                             </a>
                         </h5>
@@ -77,7 +197,7 @@
                                                 <span class="price-new">${{p.discount_price}}</span>
                                             </div> <!-- price-wrap.// -->
                                         </div>
-                                      {% if request.user.user_type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                      {% if request.user.type == 'customer' and not request.user.is_staff and p.stock > 0 %}
                                       <div class="col-6 col-md-12 col-lg-6 col-xl-6">
                                         <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
                                             {% csrf_token %}
