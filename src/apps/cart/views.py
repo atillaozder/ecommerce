@@ -7,6 +7,7 @@ from django.contrib import messages
 
 from .models import CartItem
 from order.models import Order
+import random
 
 
 class CartView(LoginRequiredMixin, View):
@@ -46,6 +47,13 @@ class CheckoutDoneView(LoginRequiredMixin, View):
         user = request.user
         billing = user.billing
         shipping = user.shipping
+
+        number = random.randint(1, 10)
+        if number <= 3:
+            info_message = _('An error occupied while trying to set order. Please try again.')
+            messages.add_message(request, messages.INFO, info_message)
+            return redirect('carts:checkout')
+
         if billing is not None and shipping is not None:
             cart = user.shopping_cart
             cart_items = cart.cartitem_set.all()
@@ -81,4 +89,5 @@ class CheckoutDoneView(LoginRequiredMixin, View):
         info_message = _('You need to set a default billing and shipping addresses.')
         messages.add_message(request, messages.INFO, info_message)
         return redirect('carts:checkout')
+
 
