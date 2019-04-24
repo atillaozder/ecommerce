@@ -13,6 +13,14 @@ class AddressCreateView(LoginRequiredMixin, CreateView):
     form_class = AddressForm
 
     def get(self, request, *args, **kwargs):
+        """
+            check user if customer render page
+            Args:
+                request:logged in user
+            Returns:
+                rendered page for the address form
+            Raises:
+        """
         if not request.user.type == 'customer':
             raise Http404
         context = {'form': self.form_class}
