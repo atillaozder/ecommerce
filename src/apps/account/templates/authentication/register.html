@@ -3,48 +3,48 @@
 
 {% block title %}{% trans "Sign Up" %}{% if site.name %} - {{ site.name }}{% endif %}{% endblock title %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5">
-      <div class="card">
-        <article class="card-body">
-          <h5 class="card-title text-center">{% trans "Sign Up" %}</h5>
-          <hr>
-          <form method="post">
-            {% csrf_token %}
-            {% if form.visible_fields %}
-                {% csrf_token %}
-                {% for field in form.visible_fields %}
-                <div class="form-group">
-                  <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-                  <div class="input-group">
-                    {{ field }}
-                  </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5">
+                <div class="card">
+                    <article class="card-body">
+                        <h5 class="card-title text-center">{% trans "Sign Up" %}</h5>
+                        <hr>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% if form.visible_fields %}
+                                {% csrf_token %}
+                                {% for field in form.visible_fields %}
+                                    <div class="form-group">
+                                        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                                        <div class="input-group">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <p class="text-danger">
+                                        {% for error in field.errors %}
+                                            {{ error|escape }}
+                                        {% endfor %}
+                                    </p>
+                                {% endfor %}
+                            {% endif %}
+                            <p class="text-danger">
+                                {% for non_field_error in form.non_field_errors %}
+                                    {{ non_field_error|striptags|escape }}
+                                {% endfor %}
+                                {% for hidden_field in form.hidden_fields %}
+                                    {% for error in hidden_field.errors %}
+                                        {{ error|striptags|escape }}
+                                    {% endfor %}
+                                {% endfor %}
+                            </p>
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-danger btn-block"> {% trans "Sign Up" %}  </button>
+                            </div>
+                        </form>
+                    </article>
                 </div>
-                <p class="text-danger">
-                  {% for error in field.errors %}
-                      {{ error|escape }}
-                  {% endfor %}
-                </p>
-                {% endfor %}
-            {% endif %}
-            <p class="text-danger">
-              {% for non_field_error in form.non_field_errors  %}
-                {{ non_field_error|striptags|escape }}
-              {% endfor %}
-              {% for hidden_field in form.hidden_fields %}
-                {% for error in hidden_field.errors %}
-                    {{ error|striptags|escape }}
-                {% endfor %}
-              {% endfor %}
-            </p>
-            <div class="form-group text-center">
-              <button type="submit" class="btn btn-danger btn-block"> {% trans "Sign Up" %}  </button>
             </div>
-          </form>
-        </article>
-      </div>
+        </div>
     </div>
-  </div>
-</div>
 {% endblock content %}
