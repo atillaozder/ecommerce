@@ -43,7 +43,7 @@
           <h6 class="float-left mt-1">{% trans "My Basket" %}</h6>
           <span class="badge badge-pill badge-danger"
               style="right: 90px; top: -8px;">
-            0
+            {{ request.user.shopping_cart.products.count }}
           </span>
         </a>
 
@@ -83,21 +83,21 @@
   <div class="collapse navbar-collapse" id="navbarNavDropdown">
     <ul class="navbar-nav mx-auto my-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="{% url 'home' %}">{% trans "Home" %} <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-          {% if request.user.is_staff %}
-              <a class="nav-link" href="{% url 'products:approve_pending' %}">{% trans "Registered Products" %}</a>
-          {% else %}
-              <a class="nav-link" href="#">{% trans "Best Sellers of Month" %}</a>
-          {% endif %}
+        <a class="nav-link" href="{% url 'home' %}">{% trans "HOME" %} <span class="sr-only">(current)</span></a>
       </li>
         {% if request.user.is_staff %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'products:delete_pending' %}">{% trans "Deleted Products" %}</a>
+                <a class="nav-link" href="{% url 'products:approve_pending' %}">{% trans "REGISTERED PRODUCTS" %}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:distributors' %}">{% trans "Registered Distributors" %}</a>
+                <a class="nav-link" href="{% url 'users:distributors' %}">{% trans "REGISTERED DISTRIBUTORS" %}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'products:delete_pending' %}">{% trans "DELETED PRODUCTS" %}</a>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'products:featured' %}">{% trans "FEATURED" %}</a>
             </li>
         {% endif %}
     </ul>

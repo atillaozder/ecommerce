@@ -1,13 +1,15 @@
 from django.views.generic import View
 from django.shortcuts import render
 from category.models import Category
+from product.models import Product
 
 
 class HomeView(View):
 
-    def get(self, request, *args, **kwargs):
-        categories = Category.objects.all()
+    def get(self, request):
         context = {
-            'categories': categories
+            'categories': Category.objects.all(),
+            'recent': Product.objects.all().recent(),
+            'featured': Product.objects.all().featured()
         }
-        return render(request, 'home.html', context)
+        return render(self.request, 'home.html', context)
