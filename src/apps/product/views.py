@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, Http404
 from django.core.exceptions import ValidationError
 from .models import Product, ProductLike, ProductImage
@@ -61,6 +62,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
         if valid:
             _handle_product_form(self.request, form.instance, images=images)
+            form.instance.distributor = self.request.user
             if self.request.user.is_staff:
                 form.instance.is_approved = True
                 form.instance.save()
@@ -284,3 +286,34 @@ class ProductFilterView(View):
         return render(request, 'product_list.html', context)
 
 
+class ProductCategoryListView(View):
+
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug', None)
+        if slug:
+            qs = Product.objects.filter(category__slug=slug)
+            context = {'products': qs}
+            return render(self.request, "product_list.html", context)
+        return redirect('home')
+
+
+class ProductDistributorListView(View):
+
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username', None)
+        if username:
+            qs = Product.objects.filter(distributor__username__exact=username)
+            context = {'products': qs}
+            return render(self.request, "product_list.html", context)
+        return redirect('home')
+
+
+class ProductFeaturedView(View):
+
+    def get(self, request):
+        qs = Product.objects.all().featured()
+        context = {
+            'products': qs,
+            'q': 'featured'
+        }
+        return render(self.request, "product_list.html", context)
