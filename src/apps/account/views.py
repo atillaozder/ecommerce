@@ -235,7 +235,10 @@ class DistributorPendingListView(LoginRequiredMixin, View):
         if not Distributor._meta.ordering:
             qs = qs.order_by('pk')
 
-        context = {}
+        context = {
+            'count': qs.count()
+        }
+
         if qs.exists():
             context = {}
             page = request.GET.get('page', 1)

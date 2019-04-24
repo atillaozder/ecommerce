@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{{ distributors.all.count }} | {% trans "waiting for approvement" %}{% endblock title %}
+{% block title %}{{ count }} | {% trans "waiting for approvement" %}{% endblock title %}
 {% block content %}
 <section class="section-content bg padding-y border-top">
 	<div class="container">
 		<nav class="mb-4 mt-3">
 			<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
-					<li class="breadcrumb-item active" aria-current="page">{% trans "Approvement pending distributors" %}</li>
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{% trans "Approvement pending distributors" %}</li>
 			</ol>
 		</nav>
 		<div class="row">
