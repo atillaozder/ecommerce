@@ -7,7 +7,7 @@ from django.utils import timezone
 from utils.utils import get_upload_path
 from cart.models import CartItem
 from decimal import Decimal
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.conf import settings
 
 User = get_user_model()
@@ -46,11 +46,18 @@ class ProductQuerySet(models.query.QuerySet):
 
     def by_order_amount(self, amount, category=None):
         if category is None:
-            return self.accepted().filter(order_amount__gte=amount)
-        return self.accepted().filter(category_name=category.name).filter(order_amount_gte=amount)
+            return self.accepted()\
+                .annotate(order=Count('order_amount'))\
+                .filter(order__gt=amount)
+        return self.accepted()\
+            .filter(category__name=category.name)\
+            .annotate(order=Count('order_amount'))\
+            .filter(order__gt=amount)
 
     def by_likes(self, like_amount):
-        return self.accepted().annotate(num_like=('likes')).filter(num_like__gte=like_amount)
+        return self.accepted()\
+            .annotate(num_like=Count('likes'))\
+            .filter(num_like__gte=like_amount)
 
     def recent(self):
         return self.accepted().order_by("-updated", "-timestamp")
@@ -58,7 +65,7 @@ class ProductQuerySet(models.query.QuerySet):
     def by_range(self, start_date, end_date=None):
         if end_date is None:
             return self.filter(updated__gte=start_date)
-        return self.filter(updated_gte=start_date).filter(updated_lte=end_date)
+        return self.filter(updated__gte=start_date).filter(updated__lte=end_date)
 
 
 class ProductManager(models.Manager):

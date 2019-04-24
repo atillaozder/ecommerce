@@ -7,15 +7,17 @@
 	<div class="container">
 		<nav class="mb-4 mt-3">
 			<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
-					<li class="breadcrumb-item active" aria-current="page">{% trans "Search" %}</li>
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{% trans "Products" %}</li>
 			</ol>
 		</nav>
 		<div class="row">
             <div class="col-md-12">
-                <div class="padding-y-sm">
-                    <h5>{{ products.count }} results for {{ q }}</h5>
-                </div>
+                {% if q %}
+                    <div class="padding-y-sm">
+                        <h5>{{ products.count }} results for {{ q }}</h5>
+                    </div>
+                {% endif %}
                 <div class="row-sm">
                     {% for p in products %}
                         <div class="col-md-3">
@@ -44,7 +46,7 @@
                                                     <span class="price-new">${{p.discount_price}}</span>
                                                 </div> <!-- price-wrap.// -->
                                             </div>
-                                          {% if request.user.user_type == 'customer' and not request.user.is_staff and p.stock > 0 %}
+                                          {% if request.user.type == 'customer' and not request.user.is_staff and p.stock > 0 %}
                                           <div class="col-6 col-md-12 col-lg-6 col-xl-6">
                                             <form method="POST" action="{% url 'products:add_to_cart' p.slug %}">
                                                 {% csrf_token %}
