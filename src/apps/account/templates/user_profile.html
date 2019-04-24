@@ -176,8 +176,8 @@
                             <br>
                             <h6 class="text-muted">{% trans "Approved" %}<span> ({{ products.accepted.count }})</span></h6>
                         {% endif %}
+                        <div class="row">
 						{% for p in products.accepted %}
-							<div class="row">
                                 <div class="col-md-6">
                                     <figure class="card card-product">
                                         {% if p.is_todays_product %}
@@ -221,8 +221,8 @@
                                         </figcaption>
                                     </figure> <!-- card // -->
                                 </div> <!-- col // -->
-							</div> <!-- row.// -->
 						{% endfor %}
+                        </div> <!-- row.// -->
                         {% if products.pending %}
                             <br>
                             <h6 class="text-muted">{% trans "Waiting for approvement" %}<span> ({{ products.pending.count }})</span></h6>

@@ -43,21 +43,18 @@
           <h6 class="float-left mt-1">{% trans "My Basket" %}</h6>
           <span class="badge badge-pill badge-danger"
               style="right: 90px; top: -8px;">
-            {{ request.user.shopping_cart.products.count }}
+            {{ request.user.shopping_cart.cartitem_set.all.count }}
           </span>
         </a>
-
-        <a href="#" role="button" aria-pressed="true"
-          class="btn btn-secondary d-block d-sm-none bg-secondary" id="userBasket"
-          style="padding: 8px 0 8px 10px;">
-          <span class="float-left mr-3 mt-1">
-            <i class="fas fa-shopping-cart fa-lg"></i>
-          </span>
-          <span class="badge badge-pill badge-danger"
-              style="right: 25px; top: -8px;">
-              0
-          </span>
-        </a>
+      {% else %}
+      <a href="{% url 'products:create' %}" role="button" aria-pressed="true"
+        class="btn btn-outline-info"
+        style="padding: 8px 10px 8px 10px;">
+        <span class="mt-1 mr-1 ml-1 d-sm-none d-block">
+          <i class="fas fa-registered fa-lg"></i>
+        </span>
+        <h6 class="mt-1 d-none d-sm-block">{% trans "Register Product" %}</h6>
+      </a>
       {% endif %}
     {% else %}
       <div class="col-lg-6-24 col-sm-7 col-8 order-2 order-lg-3">
