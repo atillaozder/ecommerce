@@ -72,7 +72,7 @@ class UserRegisterForm(forms.ModelForm):
         'username_exists': _("Username is already exists."),
         'email_exists': _("Email is already exists."),
         'password_character': _("Password should be in a character range 6 and 30."),
-        'username_character': _("Username should be in a character range 6 and 30."),
+        'username_character': _("Username should be in a character range 4 and 30."),
         'smaller_than_zero': _("Average salary cannot be smaller than zero"),
     }
 
@@ -140,7 +140,7 @@ class UserRegisterForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError(self.error_messages['password_mismatch'])
 
-        if len(password) < 8 or len(password) > 30:
+        if len(password) < 6 or len(password) > 30:
             raise forms.ValidationError(self.error_messages['password_character'])
 
         return password

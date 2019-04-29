@@ -21,8 +21,6 @@ class AddressCreateView(LoginRequiredMixin, CreateView):
                 rendered page for the address form
             Raises:
         """
-        if not request.user.type == 'customer':
-            raise Http404
         context = {'form': self.form_class}
         return render(request, self.template_name, context)
 
