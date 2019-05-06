@@ -1,17 +1,16 @@
-Register: min 6 character required but actually it needs 9 characters.[Solved]
-Distributer adds stockless[added as no stock], priceless product
-Admin adds category from admin panel not in as user
+Register: min 6 character required but actually it needs 9 characters.[SOLVED]
 Distributer address add not working it was working for only customer[SOLVED]
-Admin and distributor cannot order but can add address[Reason:Need to remove address card]
-After refresh profile not opening on the first click
-Change password rules not same with register password rules
-Forget password ask for e-mail.It shouldn't have
-Products of distributor not added to distributions tab before or after addition[Reason:Distributor field not setted for registered product].They can be listed after added from admin panel.
-After delete distributor his product and its stock remains as the same.
-Recently added product added to featured.
-Cart: Quantity not changing from cart
-Without default addresses of one of address fields cannot checkout cart
-Distributor cannot see orders of their items
-Cannot add 1 stocked product to cart
-Couldn't try failded checkout
-Distributor delete product button not working.
+Admin and distributor cannot order but can add address[SOLVED]
+After delete distributor his product and its stock remains as the same[SOLVED](is_active false çekildiği için. Bu şekilde olmasının bir zararı yok)
+Distributer adds stockless[added as no stock], priceless product[SOLVED]
+Change password rules not same with register password rules[SOLVED]
+Products of distributor not added to distributions 
+tab before or after addition[Reason:Distributor field not setted for registered product].
+They can be listed after added from admin panel.[SOLVED]
+Distributor cannot see orders of their items[SOLVED]
+Distributor delete product button not working[SOLVED]
+After refresh profile not opening on the first click[SOLVED]
+Couldn't try failded checkout[SOLVED]
+Without default addresses of one of address fields cannot checkout cart[SOLVED]
+Cannot add 1 stocked product to cart[SOLVED]
+---- Cart: Quantity not changing from cart - (AJAX REQUEST) -----
