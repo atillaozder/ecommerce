@@ -9,7 +9,7 @@ User = get_user_model()
 class CartItem(models.Model):
     cart = models.ForeignKey('Cart', on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(_('Quantity'), default=1)
+    quantity = models.PositiveIntegerField(_('Quantity'), default=0)
     item_total = models.DecimalField(_('Total Price'), default=0.00, max_digits=100, decimal_places=2)
     is_active = models.BooleanField(_('Active'), default=True)
 

@@ -42,7 +42,7 @@
                             <h5 class="text-center mt-3">{{ object.username }}</h5>
                             <div class="nav flex-column nav-pills mt-4" id="v-pills-tab" role="tablist"
                                  aria-orientation="vertical">
-                                {% if request.user == object %}
+                                {% if request.user == object and object.type != 'distributor' and not object.is_staff %}
                                     <a class="nav-link active" id="v-pills-profile-tab"
                                        data-toggle="pill"
                                        href="#v-pills-profile"
@@ -54,7 +54,7 @@
                                     </a>
                                 {% endif %}
                                 {% if object.distributor %}
-                                    <a class="nav-link {% if not request.user == object %}active{% endif %}"
+                                    <a class="nav-link {% if not request.user == object or object.type == 'distributor' %}active{% endif %}"
                                        id="v-pills-products-tab"
                                        data-toggle="pill"
                                        href="#v-pills-products"
@@ -80,100 +80,102 @@
                 </aside> <!-- col.// -->
                 <main class="col-md-8">
                     <div class="tab-content" id="v-pills-tabContent">
-                        <div class="tab-pane fade {% if request.user == object %}show active{% endif %}"
-                             id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                            <div class="row">
-                                <div class="col-md-6 mt-3">
-                                    <article class="box h-100">
-                                        <figure class="itembox text-center">
+                        {% if request.user.type != 'distributor' and not request.user.is_staff %}
+                            <div class="tab-pane fade {% if request.user == object %}show active{% endif %}"
+                                 id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                                <div class="row">
+                                    <div class="col-md-6 mt-3">
+                                        <article class="box h-100">
+                                            <figure class="itembox text-center">
 										<span class="mt-2 icon-wrap rounded icon-sm bg-success">
 										<i class="fas fa-money-check-alt white"></i>
 										</span>
-                                            <figcaption class="text-wrap">
-                                                <h5 class="title">{% trans "Current Billing" %}</h5>
-                                                {% if request.user.billing %}
-                                                    <p class="text-muted">{{ request.user.billing.get_country_display }}</p>
-                                                    <p class="text-muted">{{ request.user.billing.get_address }}</p>
-                                                    <p class="text-muted">{{ request.user.billing.notes }}</p>
-                                                {% else %}
-                                                    <p class="text-muted">{% trans "Current Billing is not set." %}</p>
-                                                {% endif %}
-                                            </figcaption>
-                                        </figure>
-                                    </article>
-                                </div>
-                                <div class="col-md-6 mt-3">
-                                    <article class="box h-100">
-                                        <figure class="itembox text-center">
+                                                <figcaption class="text-wrap">
+                                                    <h5 class="title">{% trans "Current Billing" %}</h5>
+                                                    {% if request.user.billing %}
+                                                        <p class="text-muted">{{ request.user.billing.get_country_display }}</p>
+                                                        <p class="text-muted">{{ request.user.billing.get_address }}</p>
+                                                        <p class="text-muted">{{ request.user.billing.notes }}</p>
+                                                    {% else %}
+                                                        <p class="text-muted">{% trans "Current Billing is not set." %}</p>
+                                                    {% endif %}
+                                                </figcaption>
+                                            </figure>
+                                        </article>
+                                    </div>
+                                    <div class="col-md-6 mt-3">
+                                        <article class="box h-100">
+                                            <figure class="itembox text-center">
 										<span class="mt-2 icon-wrap rounded icon-sm bg-warning">
 										<i class="fas fa-truck-loading white"></i>
 										</span>
-                                            <figcaption class="text-wrap">
-                                                <h5 class="title">{% trans "Current Shipping" %}</h5>
-                                                {% if request.user.shipping %}
-                                                    <p class="text-muted">{{ request.user.shipping.get_country_display }}</p>
-                                                    <p class="text-muted">{{ request.user.shipping.get_address }}</p>
-                                                    <p class="text-muted">{{ request.user.shipping.notes }}</p>
-                                                {% else %}
-                                                    <p class="text-muted">{% trans "Current Shipping is not set." %}</p>
-                                                {% endif %}
-                                            </figcaption>
-                                        </figure>
-                                    </article>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="title-text">
-                                        <span> {% trans "Addresses" %}</span>
-                                        <a href="{% url 'address:create' %}" class="pl-2">
-                                            <span class="my-2" style="font-size:.8em">{% trans "New" %}</span>
-                                        </a>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="row">
-                                {% for address in request.user.addresses.all %}
-                                    <div class="col-lg-6 mb-3">
-                                        <article class="box h-100">
-                                            <a href="{% url 'address:update' address.pk %}" role="button"
-                                               class="btn btn-outline-danger"><i class="fas fa-wrench"></i></a>
-                                            <button type="button" class="btn btn-outline-danger ml-2 address-delete"
-                                                    data-toggle="modal" data-target="#addressDeleteModal"
-                                                    id="{{ address.pk }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <figure class="itembox text-center">
-                                                <span class="mt-2 icon-wrap rounded icon-sm bg-dark"><i
-                                                        class="fas fa-truck white"></i></span>
                                                 <figcaption class="text-wrap">
-                                                    <h5 class="title">{{ address.get_country_display }}</h5>
-                                                    <p class="text-muted">{{ address.get_address }}</p>
-                                                    <p class="text-muted">{{ address.notes }}</p>
+                                                    <h5 class="title">{% trans "Current Shipping" %}</h5>
+                                                    {% if request.user.shipping %}
+                                                        <p class="text-muted">{{ request.user.shipping.get_country_display }}</p>
+                                                        <p class="text-muted">{{ request.user.shipping.get_address }}</p>
+                                                        <p class="text-muted">{{ request.user.shipping.notes }}</p>
+                                                    {% else %}
+                                                        <p class="text-muted">{% trans "Current Shipping is not set." %}</p>
+                                                    {% endif %}
                                                 </figcaption>
                                             </figure>
-                                            <form action="{% url 'users:update_address' %}" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="address_pk" value="{{ address.pk }}">
-                                                {% if address.pk != request.user.shipping.pk %}
-                                                    <button type="submit" name="shipping"
-                                                            class="btn btn-block btn-warning text-white">
-                                                        {% trans "Set as current shipping" %}
-                                                    </button>
-                                                {% endif %}
-                                                {% if address.pk != request.user.billing.pk %}
-                                                    <button type="submit" name="billing"
-                                                            class="btn btn-block btn-success">
-                                                        {% trans "Set as current billing" %}
-                                                    </button>
-                                                {% endif %}
-                                            </form>
                                         </article>
                                     </div>
-                                {% endfor %}
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="title-text">
+                                            <span> {% trans "Addresses" %}</span>
+                                            <a href="{% url 'address:create' %}" class="pl-2">
+                                                <span class="my-2" style="font-size:.8em">{% trans "New" %}</span>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    {% for address in request.user.addresses.all %}
+                                        <div class="col-lg-6 mb-3">
+                                            <article class="box h-100">
+                                                <a href="{% url 'address:update' address.pk %}" role="button"
+                                                   class="btn btn-outline-danger"><i class="fas fa-wrench"></i></a>
+                                                <button type="button" class="btn btn-outline-danger ml-2 address-delete"
+                                                        data-toggle="modal" data-target="#addressDeleteModal"
+                                                        id="{{ address.pk }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <figure class="itembox text-center">
+                                                <span class="mt-2 icon-wrap rounded icon-sm bg-dark"><i
+                                                        class="fas fa-truck white"></i></span>
+                                                    <figcaption class="text-wrap">
+                                                        <h5 class="title">{{ address.get_country_display }}</h5>
+                                                        <p class="text-muted">{{ address.get_address }}</p>
+                                                        <p class="text-muted">{{ address.notes }}</p>
+                                                    </figcaption>
+                                                </figure>
+                                                <form action="{% url 'users:update_address' %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="address_pk" value="{{ address.pk }}">
+                                                    {% if address.pk != request.user.shipping.pk %}
+                                                        <button type="submit" name="shipping"
+                                                                class="btn btn-block btn-warning text-white">
+                                                            {% trans "Set as current shipping" %}
+                                                        </button>
+                                                    {% endif %}
+                                                    {% if address.pk != request.user.billing.pk %}
+                                                        <button type="submit" name="billing"
+                                                                class="btn btn-block btn-success">
+                                                            {% trans "Set as current billing" %}
+                                                        </button>
+                                                    {% endif %}
+                                                </form>
+                                            </article>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade {% if not request.user == object %}show active{% endif %}"
+                        {% endif %}
+                        <div class="tab-pane fade {% if not request.user == object or object.type == 'distributor' %}show active{% endif %}"
                              id="v-pills-products"
                              role="tabpanel"
                              aria-labelledby="v-pills-products-tab">
@@ -382,26 +384,27 @@
         </div>
     </div>
 
-    {% comment %}<div class="modal fade" tabindex="-1" role="dialog" id="productDeleteModal" aria-labelledby="productDeleteModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">{% trans "Are you sure you want to delete the product?" %}</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
-				<form action="{% url 'products:delete_request' %}" method="post">
-					{% csrf_token %}
-					<input type="hidden" id="productPk" name="id" value="0">
-					<button type="submit" name="button" class="btn btn-danger">{% trans "Delete" %}</button>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>{% endcomment %}
+    <div class="modal fade" tabindex="-1" role="dialog" id="productDeleteModal"
+         aria-labelledby="productDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{% trans "Are you sure you want to delete the product?" %}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
+                    <form action="{% url 'products:delete_request' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="productPk" name="id" value="0">
+                        <button type="submit" name="button" class="btn btn-danger">{% trans "Delete" %}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="accountDeleteModal"
          aria-labelledby="accountDeleteModalLabel" aria-hidden="true">

@@ -132,8 +132,6 @@ class UserRegisterForm(forms.ModelForm):
         password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
-        print(self.cleaned_data)
-
         if not password or not confirm_password:
             raise forms.ValidationError(self.error_messages['password_mismatch'])
 
@@ -214,6 +212,8 @@ class UserPasswordChangeForm(UserSetPasswordForm):
     error_messages = {
         **SetPasswordForm.error_messages,
         'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
+        'password_mismatch': _("The two password fields didn't match."),
+        'password_character': _("Password should be in a character range 6 and 30."),
     }
 
     old_password = forms.CharField(
@@ -235,3 +235,20 @@ class UserPasswordChangeForm(UserSetPasswordForm):
                 code='password_incorrect',
             )
         return old_password
+
+    def clean_new_password2(self):
+        old_password = self.cleaned_data.get('old_password')
+        password = self.cleaned_data.get('new_password1')
+        confirm_password = self.cleaned_data.get('new_password2')
+
+        if not password or not confirm_password:
+            raise forms.ValidationError(self.error_messages['password_mismatch'])
+
+        if password != confirm_password:
+            raise forms.ValidationError(self.error_messages['password_mismatch'])
+
+        if len(password) < 6 or len(password) > 30:
+            raise forms.ValidationError(self.error_messages['password_character'])
+
+        if old_password == password:
+            raise forms.ValidationError(_('The two password cannot be same.'))

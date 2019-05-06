@@ -21,7 +21,7 @@ class ProductQuerySet(models.query.QuerySet):
         return self.filter(is_active=False)
 
     def deleted(self):
-        return self.filter(is_deleted=True)
+        return self.filter(is_deleted=True).filter(is_active=True)
 
     def not_deleted(self):
         return self.filter(is_deleted=False)
@@ -39,8 +39,8 @@ class ProductQuerySet(models.query.QuerySet):
         return self.active().not_deleted().not_approved()
 
     def featured(self):
-        qs_orders = self.by_order_amount(100)
-        qs_likes = self.by_likes(10)
+        qs_orders = self.accepted().by_order_amount(100)
+        qs_likes = self.accepted().by_likes(10)
         qs_discounts = self.accepted().filter(discount__gte=20)
         return (qs_orders | qs_likes | qs_discounts).distinct()
 

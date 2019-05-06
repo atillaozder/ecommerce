@@ -56,3 +56,15 @@ class ProductForm(forms.ModelForm):
             'stock',
             'images'
         ]
+
+    def clean_price(self):
+        price = self.cleaned_data["price"]
+        if price <= 0:
+            raise forms.ValidationError('Price must be higher than 0.')
+        return price
+
+    def clean_stock(self):
+        stock = self.cleaned_data["stock"]
+        if stock <= 0:
+            raise forms.ValidationError('Stock must be higher than 0.')
+        return stock

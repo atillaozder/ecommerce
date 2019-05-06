@@ -29,7 +29,7 @@ class ProductDetailView(DetailView):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         instance = context['product']
         category = instance.category.all().first()
-        products = Product.objects.exclude(pk=instance.pk).by_order_amount(250, category=category)
+        products = Product.objects.exclude(pk=instance.pk).by_order_amount(250, category=category).accepted()
         context['best_products'] = products
         return context
 
@@ -62,10 +62,11 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
         if valid:
             _handle_product_form(self.request, form.instance, images=images)
-            form.instance.distributor = self.request.user
+            instance = form.save(commit=False)
+            instance.distributor = self.request.user
             if self.request.user.is_staff:
-                form.instance.is_approved = True
-                form.instance.save()
+                instance.is_approved = True
+            instance.save()
             return valid
 
 
@@ -141,7 +142,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         return valid
 
 
-class ProductDeleteView(LoginRequiredMixin,View):
+class ProductDeleteView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
@@ -182,26 +183,6 @@ class ProductDeletePendingListView(LoginRequiredMixin, ListView):
             raise Http404
 
 
-def _update_item_qty_or_add(request, quantity, product=None):
-    if product is not None and quantity < product.stock:
-        cart = request.user.shopping_cart
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product, is_active=True)
-        if created:
-            cart_item.quantity = quantity
-            cart_item.save()
-            return _('Product is added to your basket.')
-        else:
-            new_qty = cart_item.quantity + quantity
-            if new_qty > product.stock:
-                return _('Stock is not enough for quantity amount.')
-            else:
-                cart_item.quantity = new_qty
-                cart_item.save()
-                return _('Quantity amount is updated.')
-    else:
-        return _('Stock is not enough for quantity amount.')
-
-
 class ProductAddToCartView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
@@ -218,9 +199,25 @@ class ProductAddToCartView(LoginRequiredMixin, View):
             info_message = _('Product is out of stock.')
             messages.add_message(self.request, messages.INFO, info_message)
         else:
-            info_message = _update_item_qty_or_add(request, qty, product=product)
+            if product is not None and qty <= product.stock:
+                cart = request.user.shopping_cart
+                cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product, is_active=True)
+                if created:
+                    cart_item.quantity = qty
+                    cart_item.is_active = True
+                    cart_item.save()
+                    info_message = _('Product is added to your basket.')
+                else:
+                    new_qty = cart_item.quantity + qty
+                    if new_qty > product.stock:
+                        info_message = _('Stock is not enough for quantity amount.')
+                    else:
+                        cart_item.quantity = new_qty
+                        cart_item.save()
+                        info_message = _('Quantity amount is updated.')
+            else:
+                info_message = _('Stock is not enough for quantity amount.')
             messages.add_message(self.request, messages.INFO, info_message)
-
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -276,7 +273,7 @@ class ProductFilterView(View):
             Q(description__icontains=q) |
             Q(category__name__icontains=q) |
             Q(distributor__username__icontains=q)
-        )
+        ).accepted()
 
         context = {
             'q': q,
@@ -291,7 +288,7 @@ class ProductCategoryListView(View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug', None)
         if slug:
-            qs = Product.objects.filter(category__slug=slug)
+            qs = Product.objects.filter(category__slug=slug).accepted()
             context = {'products': qs}
             return render(self.request, "product_list.html", context)
         return redirect('home')
@@ -302,7 +299,7 @@ class ProductDistributorListView(View):
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username', None)
         if username:
-            qs = Product.objects.filter(distributor__username__exact=username)
+            qs = Product.objects.filter(distributor__username__exact=username).accepted()
             context = {'products': qs}
             return render(self.request, "product_list.html", context)
         return redirect('home')
