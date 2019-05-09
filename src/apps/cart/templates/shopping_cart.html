@@ -4,151 +4,169 @@
 
 {% block title %}{{ request.user.username }} | {% trans "Shopping Cart" %}{% endblock title %}
 {% block content %}
-<section class="section-content bg padding-y border-top">
-	<div class="container">
-		<div class="row">
-			{% if cart.products.count > 0 %}
-				<main class="col-md-9 mb-4">
-					<div class="card">
-						<table class="table shopping-cart-wrap">
-							<thead class="text-muted">
-								<tr>
-									<th scope="col" width="10%">{% trans "Product" %}</th>
-									<th scope="col" width="53%">{% trans "" %}</th>
-									<th scope="col" width="12%">{% trans "Quantity" %}</th>
-									<th scope="col" width="15%">{% trans "Price" %}</th>
-									<th scope="col" class="text-right" width="10%">{% trans "" %}</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for product in cart.products.all.active.not_deleted %}
-								<tr>
-									<td>
-										<figure class="media">
-											<div class="img-wrap">
-												<img src="{{ product.get_first_image_url }}" alt="{{ product.name }}"
-														class="img-thumbnail img-sm">
-											</div>
-										</figure>
-									</td>
-									<td>
-										<h6 class="title">
-											<a href="{{ product.get_absolute_url }}">
-												{{ product.name }}
-											</a>
-										</h6>
-									</td>
-									<td>
-										{% for cart_item in cart.cartitem_set.all %}
-										    {% if product == cart_item.product %}
-													<input type="number" name="quantity" id="{{ product.pk }}"
-															min="0" step="1" max="{{ product.stock }}"
-															class="form-control my-2" value="{{ cart_item.quantity }}">
-										    {% endif %}
-										{% endfor %}
-									</td>
-									<td>
-										<div class="price-wrap mt-2">
-											<var class="price text-dark">
-												{% for cart_item in cart.cartitem_set.all  %}
-														{% if product.pk == cart_item.product.pk %}
-																${{ cart_item.item_total }}
-														{% endif %}
-												{% endfor %}
-											</var>
-										</div> <!-- price-wrap .// -->
-									</td>
-									<td class="text-right">
-										<form action="{% url 'products:remove_from_cart' product.slug %}" method="post">
-											{% csrf_token %}
-											<input type="hidden" name="id" value="{{ product.pk }}">
-											<button type="submit" name="button"
-												class="btn btn-light mr-3 mt-2">
-												<i class="fas fa-times"></i>
-											</button>
-										</form>
-									</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div> <!-- card.// -->
-				</main> <!-- col.// -->
+    <section class="section-content bg padding-y border-top">
+        <div class="container">
+            <div class="row">
+                {% if cart.products.count > 0 %}
+                    <main class="col-md-9 mb-4">
+                        <div class="card">
+                            <table class="table shopping-cart-wrap">
+                                <thead class="text-muted">
+                                <tr>
+                                    <th scope="col" width="10%">{% trans "Product" %}</th>
+                                    <th scope="col" width="53%">{% trans "" %}</th>
+                                    <th scope="col" width="12%">{% trans "Quantity" %}</th>
+                                    <th scope="col" width="15%">{% trans "Price" %}</th>
+                                    <th scope="col" class="text-right" width="10%">{% trans "" %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for product in cart.products.all.active.not_deleted %}
+                                    <tr>
+                                        <td>
+                                            <figure class="media">
+                                                <div class="img-wrap">
+                                                    <img src="{{ product.get_first_image_url }}"
+                                                         alt="{{ product.name }}"
+                                                         class="img-thumbnail img-sm">
+                                                </div>
+                                            </figure>
+                                        </td>
+                                        <td>
+                                            <h6 class="title">
+                                                <a href="{{ product.get_absolute_url }}">
+                                                    {{ product.name }}
+                                                </a>
+                                            </h6>
+                                        </td>
+                                        <td>
+                                            {% for cart_item in cart.cartitem_set.all %}
+                                                {% if product == cart_item.product %}
+                                                    <input type="number" name="quantity" id="{{ cart_item.pk }}"
+                                                           min="0" step="1" max="{{ product.stock }}"
+                                                           class="form-control my-2" value="{{ cart_item.quantity }}">
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <div class="price-wrap mt-2">
+                                                <var class="price text-dark">
+                                                    {% for cart_item in cart.cartitem_set.all %}
+                                                        {% if product.pk == cart_item.product.pk %}
+                                                            ${{ cart_item.item_total }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </var>
+                                            </div> <!-- price-wrap .// -->
+                                        </td>
+                                        <td class="text-right">
+                                            <form action="{% url 'products:remove_from_cart' product.slug %}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="id" value="{{ product.pk }}">
+                                                <button type="submit" name="button"
+                                                        class="btn btn-light mr-3 mt-2">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div> <!-- card.// -->
+                    </main> <!-- col.// -->
 
-				<aside class="col-md-3">
-					<dl class="dlist-align">
-						<dt>{% trans "Subtotal" %}: </dt>
-						<dd class="text-right">${{ cart.subtotal }}</dd>
-					</dl>
-					<dl class="dlist-align">
-						<dt>{% trans "Discount" %}: </dt>
-						<dd class="text-right">-${{ cart.get_total_discount }}</dd>
-					</dl>
-					<dl class="dlist-align">
-						<dt>{% trans "Taxes" %}: </dt>
-						<dd class="text-right">${{ cart.get_total_tax }}</dd>
-					</dl>
-					<dl class="dlist-align h4">
-						<dt>{% trans "Total" %}: </dt>
-						<dd class="text-right"><strong>${{ cart.get_total_with_discount }}</strong></dd>
-					</dl>
-					<hr>
-					<dl class="dlist-align">
-						<dd class="float-right">
-							<a role="button" href="{% url 'carts:checkout' %}" class="btn btn-success">
-								{% trans "CHECK OUT" %}
-							</a>
-						</dd>
-					</dl>
-					<figure class="itemside mt-4 mb-3">
-						<aside class="aside"><img src="{% static 'uikit/images/icons/pay-visa.png' %}"></aside>
-						 <div class="text-wrap small text-muted">
-							 Pay 84.78 AED ( Save 14.97 AED )
-						 </div>
-					</figure>
-					<figure class="itemside mb-3">
-						<aside class="aside"> <img src="{% static 'uikit/images/icons/pay-mastercard.png' %}"> </aside>
-						<div class="text-wrap small text-muted">
-							Pay by MasterCard and Save 40%.
-						</div>
-					</figure>
-				</aside> <!-- col.// -->
-			{% else %}
-				<main class="col-sm-12">
-					<h5 class="text-center">
-						{% trans "There are currently no products in your basket." %}
-					</h5>
-					<div class="text-center mt-3">
-						<a class="btn btn-lg btn-warning" role="button" aria-pressed="true"
-								href="{% url 'home' %}">
-							<i class="fas fa-shopping-basket"></i>
-							{% trans "Start shopping" %}
-						</a>
-					</div>
-				</main>
-			{% endif %}
-		</div>
-	</div> <!-- container .//  -->
-</section>
+                    <aside class="col-md-3">
+                        <dl class="dlist-align">
+                            <dt>{% trans "Subtotal" %}:</dt>
+                            <dd class="text-right">${{ cart.subtotal }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>{% trans "Discount" %}:</dt>
+                            <dd class="text-right">-${{ cart.get_total_discount }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>{% trans "Taxes" %}:</dt>
+                            <dd class="text-right">${{ cart.get_total_tax }}</dd>
+                        </dl>
+                        <dl class="dlist-align h4">
+                            <dt>{% trans "Total" %}:</dt>
+                            <dd class="text-right"><strong>${{ cart.get_total_with_discount }}</strong></dd>
+                        </dl>
+                        <hr>
+                        <dl class="dlist-align">
+                            <dd class="float-right">
+                                <a role="button" href="{% url 'carts:checkout' %}" class="btn btn-success">
+                                    {% trans "CHECK OUT" %}
+                                </a>
+                            </dd>
+                        </dl>
+                        <figure class="itemside mt-4 mb-3">
+                            <aside class="aside"><img src="{% static 'uikit/images/icons/pay-visa.png' %}"></aside>
+                            <div class="text-wrap small text-muted">
+                                Pay 84.78 AED ( Save 14.97 AED )
+                            </div>
+                        </figure>
+                        <figure class="itemside mb-3">
+                            <aside class="aside"><img src="{% static 'uikit/images/icons/pay-mastercard.png' %}">
+                            </aside>
+                            <div class="text-wrap small text-muted">
+                                Pay by MasterCard and Save 40%.
+                            </div>
+                        </figure>
+                    </aside> <!-- col.// -->
+                {% else %}
+                    <main class="col-sm-12">
+                        <h5 class="text-center">
+                            {% trans "There are currently no products in your basket." %}
+                        </h5>
+                        <div class="text-center mt-3">
+                            <a class="btn btn-lg btn-warning" role="button" aria-pressed="true"
+                               href="{% url 'home' %}">
+                                <i class="fas fa-shopping-basket"></i>
+                                {% trans "Start shopping" %}
+                            </a>
+                        </div>
+                    </main>
+                {% endif %}
+            </div>
+        </div> <!-- container .//  -->
+    </section>
 {% endblock content %}
 
 
 {% block script %}
-<script type="text/javascript">
-		$(':input').on('keyup change click', function() {
-			let value = parseInt($(this).val());
-			if (value) {
-				if (value < 0 || $(this).val().startsWith(0)) {
-					$(this).val(0);
-				}
+    <script type="text/javascript">
+        $(':input').on('keyup change click', function () {
+            let value = parseInt($(this).val());
+            if (value) {
+                if (value < 0 || $(this).val().startsWith(0)) {
+                    $(this).val(0);
+                }
 
-				let max = parseInt($(this).attr("max"));
-				if (value > max) {
-					$(this).val(max);
-				}
-			} else {
-			    $(this).val(0);
+                let max = parseInt($(this).attr("max"));
+                if (value > max) {
+                    $(this).val(max);
+                }
+            } else {
+                $(this).val(0);
             }
-		});
-</script>
+
+            let token = '{{csrf_token}}';
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                url: '{% url 'carts:update_qty' %}',
+                type: 'POST',
+                data: {
+                    'pk': $(this).attr('id'),
+                    'qty': parseInt($(this).val()),
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+    </script>
 {% endblock script %}

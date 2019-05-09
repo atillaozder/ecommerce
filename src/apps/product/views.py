@@ -137,7 +137,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         valid = super(ProductUpdateView, self).form_valid(form)
         images = self.request.FILES.getlist("images")
-        if valid:
+        if valid and images:
             _handle_product_form(self.request, form.instance, images=images)
         return valid
 
@@ -273,7 +273,7 @@ class ProductFilterView(View):
             Q(description__icontains=q) |
             Q(category__name__icontains=q) |
             Q(distributor__username__icontains=q)
-        ).accepted()
+        ).accepted().distinct()
 
         context = {
             'q': q,

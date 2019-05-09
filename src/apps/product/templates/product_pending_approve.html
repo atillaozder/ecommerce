@@ -21,14 +21,14 @@
 									<th scope="col" width="20%">{% trans "Product" %}</th>
 									<th scope="col" width="20%">{% trans "Name" %}</th>
 									<th scope="col" width="15%">{% trans "Stock" %}</th>
-									<th scope="col" width="10%">{% trans "Order" %}</th>
+									<th scope="col" width="10%">{% trans "Price" %}</th>
 									<th scope="col" width="10%">{% trans "" %}</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for product in products %}
 								<tr>
-									<td>
+									<td class="align-middle">
 										<figure class="media">
 											<div class="img-wrap">
 												<img src="{{ product.get_first_image_url }}" alt="{{ product.name }}"
@@ -36,18 +36,18 @@
 											</div>
 										</figure>
 									</td>
-									<td>
+									<td class="align-middle">
 										<h6 class="title">
 											<a href="{{ product.get_absolute_url }}">
 												{{ product.name }}
 											</a>
 										</h6>
 									</td>
-									<td>
+									<td class="align-middle">
 										<p>{{ product.stock }}</p>
 									</td>
-									<td>
-										<p>{{ product.order_amount }}</p>
+									<td class="align-middle">
+										<p>${{ product.price }}</p>
 									</td>
 									<td>
 										<div class="row">

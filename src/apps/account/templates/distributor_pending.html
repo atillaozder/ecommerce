@@ -29,20 +29,20 @@
                                 <tbody>
                                 {% for d in distributors %}
                                     <tr>
-                                        <td>
+                                        <td class="align-middle">
                                             <h6 class="title">
                                                 <a href="{{ d.user.get_absolute_url }}">
                                                     {{ d.user.username }}
                                                 </a>
                                             </h6>
                                         </td>
-                                        <td>
-                                            <p>{{ d.user.first_name }}</p>
+                                        <td class="align-middle">
+                                            <p>{{ d.user.first_name|default:'-' }}</p>
                                         </td>
-                                        <td>
-                                            <p>{{ d.user.last_name }}</p>
+                                        <td class="align-middle">
+                                            <p>{{ d.user.last_name|default:'-' }}</p>
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <p>{{ d.user.email }}</p>
                                         </td>
                                         <td>

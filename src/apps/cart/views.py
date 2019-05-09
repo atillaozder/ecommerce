@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
@@ -17,6 +17,20 @@ class CartView(LoginRequiredMixin, View):
             raise Http404
         instance = self.request.user.shopping_cart
         return render(request, 'shopping_cart.html', {'cart': instance})
+
+
+class CartItemUpdateQuantityView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        pk = request.POST.get('pk', None)
+        qty = request.POST.get('qty', None)
+        if pk and qty:
+            item_qs = CartItem.objects.filter(pk=pk)
+            if item_qs.exists():
+                item = item_qs.first()
+                item.quantity = qty
+                item.save()
+        return JsonResponse({})
 
 
 class CheckoutView(LoginRequiredMixin, View):
@@ -89,5 +103,3 @@ class CheckoutDoneView(LoginRequiredMixin, View):
         info_message = _('You need to set a default billing and shipping addresses.')
         messages.add_message(request, messages.INFO, info_message)
         return redirect('carts:checkout')
-
-

@@ -68,3 +68,10 @@ class ProductForm(forms.ModelForm):
         if stock <= 0:
             raise forms.ValidationError('Stock must be higher than 0.')
         return stock
+
+    def save(self, commit=True):
+        instance = super(ProductForm, self).save(commit=False)
+        if commit:
+            instance.is_approved = False
+            instance.save()
+        return instance
