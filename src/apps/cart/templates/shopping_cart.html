@@ -43,14 +43,14 @@
                                             {% for cart_item in cart.cartitem_set.all %}
                                                 {% if product == cart_item.product %}
                                                     <input type="number" name="quantity" id="{{ cart_item.pk }}"
-                                                           min="0" step="1" max="{{ product.stock }}"
+                                                           min="1" step="1" max="{{ product.stock }}"
                                                            class="form-control my-2" value="{{ cart_item.quantity }}">
                                                 {% endif %}
                                             {% endfor %}
                                         </td>
                                         <td>
                                             <div class="price-wrap mt-2">
-                                                <var class="price text-dark">
+                                                <var class="price text-dark" id="item_price">
                                                     {% for cart_item in cart.cartitem_set.all %}
                                                         {% if product.pk == cart_item.product.pk %}
                                                             ${{ cart_item.item_total }}
@@ -142,7 +142,7 @@
             let value = parseInt($(this).val());
             if (value) {
                 if (value < 0 || $(this).val().startsWith(0)) {
-                    $(this).val(0);
+                    $(this).val(1);
                 }
 
                 let max = parseInt($(this).attr("max"));
@@ -150,7 +150,7 @@
                     $(this).val(max);
                 }
             } else {
-                $(this).val(0);
+                $(this).val(1);
             }
 
             let token = '{{csrf_token}}';
